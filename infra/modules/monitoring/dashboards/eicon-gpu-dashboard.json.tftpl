@@ -1,0 +1,218 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": ""
+    }
+  ],
+  "title": "EICON GPU Metrics",
+  "description": "GPU utilization, memory, and temperature by pod using DCGM metrics",
+  "uid": "eicon-gpu-metrics",
+  "tags": [
+    "gpu",
+    "dcgm",
+    "eicon"
+  ],
+  "timezone": "",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "namespace",
+        "type": "query",
+        "label": "Namespace",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "$${DS_PROMETHEUS}"
+        },
+        "refresh": 1,
+        "definition": "label_values(DCGM_FI_DEV_GPU_UTIL, exported_namespace)",
+        "query": {
+          "query": "label_values(DCGM_FI_DEV_GPU_UTIL, exported_namespace)",
+          "refId": "namespaceVar"
+        },
+        "current": {
+          "selected": true,
+          "text": "${gpu_dashboard_default_namespace}",
+          "value": "${gpu_dashboard_default_namespace}"
+        },
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "GPU Utilization (%) by Pod",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg by (exported_pod) (DCGM_FI_DEV_GPU_UTIL{exported_namespace=\"$namespace\"})",
+          "legendFormat": "{{exported_pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "GPU Memory Used (MiB) by Pod",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg by (exported_pod) (DCGM_FI_DEV_FB_USED{exported_namespace=\"$namespace\"})",
+          "legendFormat": "{{exported_pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "GPU Memory Utilization (%) by Pod",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * avg by (exported_pod) (DCGM_FI_DEV_FB_USED{exported_namespace=\"$namespace\"}) / clamp_min((avg by (exported_pod) (DCGM_FI_DEV_FB_USED{exported_namespace=\"$namespace\"}) + avg by (exported_pod) (DCGM_FI_DEV_FB_FREE{exported_namespace=\"$namespace\"})), 1)",
+          "legendFormat": "{{exported_pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "GPU Temperature (C) by Pod",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg by (exported_pod) (DCGM_FI_DEV_GPU_TEMP{exported_namespace=\"$namespace\"})",
+          "legendFormat": "{{exported_pod}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    }
+  ]
+}

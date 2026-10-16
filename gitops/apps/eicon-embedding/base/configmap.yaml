@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: embedding-config
+data:
+  AWS_REGION: dummy
+  NVIDIA_VISIBLE_DEVICES: "all"
+  NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+  S3_BUCKET: dummy
+  CHECKPOINT_PATH: dummy

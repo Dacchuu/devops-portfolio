@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eicon-embedding
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: eicon-embedding
+  template:
+    metadata:
+      labels:
+        app: eicon-embedding
+    spec:
+      containers:
+        - name: embedding
+          image: 491085416489.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-embedding:latest
+
+          ports:
+            - containerPort: 5000
+
+          envFrom:
+            - configMapRef:
+                name: embedding-config
+            - secretRef:
+                name: embedding-secrets
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 0
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: "1"
+              memory: "8Gi"
+              nvidia.com/gpu: 1
+            limits:
+              cpu: "2"
+              memory: "8Gi"
+              nvidia.com/gpu: 1

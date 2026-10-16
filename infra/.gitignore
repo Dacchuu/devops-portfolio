@@ -1,0 +1,21 @@
+# ----------------------------
+# Terraform (applies everywhere in repo)
+# ----------------------------
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.backup
+**/*.tfplan
+**/tfplan
+
+# Terraform lock files (KEEP THESE!)
+# .terraform.lock.hcl  <-- DO NOT ignore this
+
+# ----------------------------
+# TFLint
+# ----------------------------
+.tflint.d/
+
+# ----------------------------
+# OS files
+# ----------------------------
+.DS_Store

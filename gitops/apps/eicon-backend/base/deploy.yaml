@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eicon-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eicon-backend
+  template:
+    metadata:
+      labels:
+        app: eicon-backend
+    spec:
+      containers:
+        - name: backend
+          image: 491085416489.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-backend:latest
+
+          ports:
+            - containerPort: 3000
+          
+          env:
+            - name: DISABLE_RATE_LIMITING
+              value: "false"
+
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secrets
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Same PVC volume mounted at two paths (valid Kubernetes pattern).
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/tmp/uploads
+            - name: uploads
+              mountPath: /app/tmp/pending-uploads
+
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "6Gi"
+
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: backend-uploads-efs

@@ -1,0 +1,231 @@
+<title>Eicon Platform Topology</title>
+<style>
+  /* layout: header, then a horizontally-scrollable diagram panel, then a two-column legend */
+  :root {
+    --bg: #faf9f6;
+    --panel: #ffffff;
+    --ink: #1c2230;
+    --muted: #5b6372;
+    --line: #dde1e8;
+    --staging: #3f6fb5;
+    --staging-bg: #eaf1fb;
+    --production: #c15a2e;
+    --production-bg: #fbece2;
+    --shared: #6b6459;
+    --shared-bg: #f1efe9;
+    --gh: #2f8f5b;
+    --gh-bg: #e7f6ee;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c;
+      --panel: #1b1f26;
+      --ink: #e8eaf0;
+      --muted: #9aa3b2;
+      --line: #2c323c;
+      --staging: #7aa8e6;
+      --staging-bg: #1b2636;
+      --production: #e8936a;
+      --production-bg: #332219;
+      --shared: #a9a296;
+      --shared-bg: #22221e;
+      --gh: #6fcf9a;
+      --gh-bg: #16261d;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c;
+    --panel: #1b1f26;
+    --ink: #e8eaf0;
+    --muted: #9aa3b2;
+    --line: #2c323c;
+    --staging: #7aa8e6;
+    --staging-bg: #1b2636;
+    --production: #e8936a;
+    --production-bg: #332219;
+    --shared: #a9a296;
+    --shared-bg: #22221e;
+    --gh: #6fcf9a;
+    --gh-bg: #16261d;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 16px 48px; display: flex; flex-direction: column; gap: 20px; }
+
+  header h1 { font-size: 1.5rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); max-width: 70ch; line-height: 1.5; font-size: 0.95rem; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+
+  .diagram-scroll { overflow-x: auto; }
+  .diagram-scroll pre.mermaid { min-width: 920px; margin: 0; }
+
+  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .legend-card h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .legend-card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 0.85rem; }
+  .legend-card dt { color: var(--muted); white-space: nowrap; }
+  .legend-card dd { margin: 0; font-family: var(--mono); font-size: 0.8rem; min-width: 0; overflow-wrap: anywhere; }
+
+  .notes { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  .notes b { color: var(--ink); font-weight: 600; }
+  .notes ul { margin: 6px 0 0; padding-left: 1.1em; }
+
+  footer { font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Eicon Platform Topology — Staging &amp; Production</h1>
+    <p>Both EKS environments run in parallel from the same GitHub repos. Staging (us-west-1) and the new production EKS build (us-east-1) are fully separate clusters with separate data — except production EKS, which deliberately shares RDS/S3/Qdrant with the still-live EC2 production while it proves itself out on <code>test.eicon.io</code>. No DNS cutover has happened yet.</p>
+  </header>
+
+  <div class="panel diagram-scroll">
+    <pre class="mermaid">
+flowchart TB
+  classDef staging fill:#eaf1fb,stroke:#3f6fb5,color:#1c2230,stroke-width:1px;
+  classDef production fill:#fbece2,stroke:#c15a2e,color:#1c2230,stroke-width:1px;
+  classDef shared fill:#f1efe9,stroke:#6b6459,color:#1c2230,stroke-width:1px;
+  classDef gh fill:#e7f6ee,stroke:#2f8f5b,color:#1c2230,stroke-width:1px;
+
+  subgraph GH["GitHub"]
+    REPOAPP["App repo<br/>eicon-backend"]
+    REPOGITOPS["GitOps repo<br/>eicon-gitops"]
+  end
+
+  subgraph STG["STAGING · us-west-1 · eicon-staging-eks"]
+    CISTG["CI<br/>staging-cd-deploy.yml"]
+    ARGOSTG["Argo CD<br/>staging-argocd.eicon.io"]
+    ALBSTG["ALB Ingress"]
+    BESTG["eicon-backend<br/>HPA 2–20"]
+    EMBSTG["eicon-embedding"]
+    CPUSTG["CPU nodes<br/>floor + Karpenter burst"]
+    GPUSTG["GPU node<br/>g4dn.xlarge"]
+    RDSSTG[("RDS Postgres<br/>staging-database")]
+    QDSTG[("Qdrant Cloud")]
+    EFSSTG[("EFS uploads")]
+    MONSTG["Prometheus · Grafana · Loki"]
+  end
+
+  subgraph PROD["PRODUCTION EKS · us-east-1 · eicon-production-eks"]
+    CIPROD["CI<br/>production-cd-deploy.yml"]
+    ARGOPROD["Argo CD<br/>production-argocd.eicon.io"]
+    ALBPROD["ALB Ingress<br/>test.eicon.io"]
+    BEPROD["eicon-backend<br/>HPA 2–20"]
+    EMBPROD["eicon-embedding<br/>HPA 1–5"]
+    SYSPROD["System floor (t3.medium)<br/>ArgoCD · CoreDNS · ESO · CSI/ALB controllers"]
+    CPUPROD["Karpenter CPU nodes<br/>m6i.large/xlarge"]
+    GPUPROD["Karpenter GPU node<br/>g4dn.xlarge, tainted"]
+    EFSPROD[("EFS uploads")]
+    GRAFPROD["Grafana<br/>k8s.grafana.eicon.io"]
+  end
+
+  subgraph DATA["Shared production data · us-east-1"]
+    RDSSHARED[("RDS Postgres<br/>database-1")]
+    QDSHARED[("Qdrant Cloud")]
+    S3SHARED[("S3 buckets")]
+  end
+
+  subgraph EC2["EC2 + Docker — LIVE traffic · us-east-1"]
+    API["api.eicon.io"]
+  end
+
+  REPOAPP -->|push: staging| CISTG
+  REPOAPP -->|push: main| CIPROD
+  REPOGITOPS -->|staging branch| ARGOSTG
+  REPOGITOPS -->|production branch| ARGOPROD
+
+  CISTG --> ARGOSTG
+  CIPROD --> ARGOPROD
+  ARGOPROD -. runs on .-> SYSPROD
+
+  ARGOSTG -. manages .-> BESTG
+  ARGOSTG -. manages .-> EMBSTG
+  ARGOPROD -. manages .-> BEPROD
+  ARGOPROD -. manages .-> EMBPROD
+
+  ALBSTG --> BESTG --> CPUSTG
+  ALBSTG --> EMBSTG --> GPUSTG
+  BESTG --> RDSSTG & QDSTG & EFSSTG
+  MONSTG -.-> BESTG
+
+  ALBPROD --> BEPROD --> CPUPROD
+  ALBPROD --> EMBPROD --> GPUPROD
+  BEPROD --> EFSPROD
+  BEPROD --> DATA
+  GRAFPROD -.-> BEPROD
+
+  API --> DATA
+  PROD -. "VPC peering<br/>10.60.0.0/16 ↔ 172.31.0.0/16" .- EC2
+
+  class GH gh
+  class REPOAPP,REPOGITOPS gh
+  class STG staging
+  class CISTG,ARGOSTG,ALBSTG,BESTG,EMBSTG,CPUSTG,GPUSTG,RDSSTG,QDSTG,EFSSTG,MONSTG staging
+  class PROD production
+  class CIPROD,ARGOPROD,ALBPROD,BEPROD,EMBPROD,SYSPROD,CPUPROD,GPUPROD,EFSPROD,GRAFPROD production
+  class DATA,EC2 shared
+  class RDSSHARED,QDSHARED,S3SHARED,API shared
+    </pre>
+  </div>
+
+  <div class="panel legend-grid">
+    <div class="legend-card">
+      <h3><span class="swatch" style="background:var(--staging)"></span>Staging</h3>
+      <dl>
+        <dt>Region</dt><dd>us-west-1</dd>
+        <dt>Cluster</dt><dd>eicon-staging-eks</dd>
+        <dt>Namespace</dt><dd>eicon-staging</dd>
+        <dt>CI trigger</dt><dd>push → staging branch</dd>
+        <dt>Data</dt><dd>own RDS + Qdrant, not shared</dd>
+      </dl>
+    </div>
+    <div class="legend-card">
+      <h3><span class="swatch" style="background:var(--production)"></span>Production EKS</h3>
+      <dl>
+        <dt>Region</dt><dd>us-east-1</dd>
+        <dt>Cluster</dt><dd>eicon-production-eks</dd>
+        <dt>Namespace</dt><dd>eicon-production</dd>
+        <dt>VPC</dt><dd>10.60.0.0/16</dd>
+        <dt>CI trigger</dt><dd>push → main branch</dd>
+        <dt>Status</dt><dd>validating on test.eicon.io</dd>
+      </dl>
+    </div>
+    <div class="legend-card">
+      <h3><span class="swatch" style="background:var(--shared)"></span>Shared / live EC2</h3>
+      <dl>
+        <dt>Data store</dt><dd>eicon/backend/credentials</dd>
+        <dt>RDS</dt><dd>database-1, PubliclyAccessible</dd>
+        <dt>Peering</dt><dd>pcx-009ffb3385f8df54b</dd>
+        <dt>EC2 VPC</dt><dd>172.31.0.0/16</dd>
+        <dt>Live endpoint</dt><dd>api.eicon.io</dd>
+      </dl>
+    </div>
+    <div class="legend-card">
+      <h3><span class="swatch" style="background:var(--gh)"></span>GitHub</h3>
+      <dl>
+        <dt>App repo</dt><dd>eicon-backend</dd>
+        <dt>GitOps repo</dt><dd>eicon-gitops</dd>
+        <dt>Branches</dt><dd>staging, production</dd>
+        <dt>Deploy</dt><dd>manual GitOps update after CI</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="panel notes">
+    <b>Reading this diagram</b>
+    <ul>
+      <li>Solid arrows are runtime traffic/data paths. Dashed arrows are GitOps management (Argo CD syncing a Deployment) or monitoring scrape paths — not request traffic.</li>
+      <li>Production EKS and the live EC2 app connect to the <b>same</b> RDS, S3 buckets, and Qdrant instance over a VPC peering connection — this is a deliberate choice so <code>test.eicon.io</code> validates against real data, not a copy.</li>
+      <li>Cutover (moving <code>api.eicon.io</code> from EC2 onto this EKS platform) is a future, separate, explicitly-confirmed DNS change — not implied by anything in this diagram.</li>
+      <li>Full written reference: <code>eicon-gitops/docs/PRODUCTION_ARCHITECTURE.md</code> and <code>eicon-gitops/docs/PLATFORM_ARCHITECTURE.md</code> (staging).</li>
+    </ul>
+  </div>
+
+  <footer>Eicon Platform — consolidated 2026-10-12</footer>
+</div>

@@ -1,0 +1,76 @@
+Create monitoring alert on Prometheus and Grafana for Ec2 Instances
+
+Check for the existing containers (ps -a)
+
+Required containers at target server
+1. CADVISOR —> list of containers to display
+2. NVIDIA_SMI_EXPORTOR —> GPU performance
+3. NODE EXPORTER —> System details
+4. ELASTIC SEARCH
+5. REDIS
+
+Create new file(Elastic Search If its not existing)
+elasticserach-exporter.yml
+	Take data collected from any Elastic Stack source and route it to the monitoring cluster
+	--> Update the private IP of Target Instance
+
+Using docker-compose run the Elastic search Container
+
+Enable Node exporter using below commands
+	sudo systemctl daemon-reload; sudo systemctl start node_exporter
+	sudo systemctl enable node_exporter; sudo systemctl status node_exporter
+
+
+-------------------------------------------------------------------------------------------------------
+
+Open Prometheus Server(measure server)
+
+Follow the below steps:
+
+1. Goto the below path for yml file
+
+cd ~
+cd monitoring/prometheus-2.14.0.linux-amd64/
+	prometheus.yml
+
+2. Take a copy of the existing prometheus.yml file
+    1. cp prometheus.yml-23032024 prometheus.yml
+
+modify actual prometheus.yml file(exporter yaml)
+
+3. Open prometheus.yml(monitoring/prometheus-2.14.0.linux-amd64/prometheus.yml) file from measure server and take any existing rules as below example and modify accordingly with Targets IP(EC2 Private IP) and Job name in text editor and update that into the same file(prometheus.yml)
+
+		- job_name: 'c11prod_5_host'
+    		static_configs:
+    		- targets: ['54.188.198.30:9100']
+  		- job_name: 'c11prod_5_services'
+    		static_configs:
+    		- targets: ['54.188.198.30:8080']
+
+4. Run this below comment to update the rules
+    	- ./promtool check config prometheus.yml
+
+cp prometheus.yml_160424 prometheus.yml
+
+    			>once this rule is added kill the recent one "history | grep kill"
+ps -aux |grep prometheus
+pgrep prometheus
+
+				eg: sudo kill -1 10640
+
+19567
+
+5. Verify the host status
+	-> After adding the remote host into the node exporter(prometheus.yml) configuration verify it by opening Prometheus Dashboard --> measure.avaamo.com:9090/targets
+
+
+-----------------------------------Successfully WE HAVE CONFIGURED Node Exporter WITH PROMETHEUS----------------------------
+
+
+Now we need to update GRAFANA Dashboard
+
+Take a copy of any json file and replace the job name and update in Grafana by creating new dashboard.
+
+Click on import --> give the dashboard name(from prometheus) and start by importing the json file.
+		The Graph starts to reflect on the Grafana Dashboard
+

@@ -1,0 +1,21 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: production-gpu
+spec:
+  role: KarpenterNodeRole-eicon-production-eks
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: eicon-production-eks
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: eicon-production-eks
+  amiFamily: AL2023
+  amiSelectorTerms:
+    - ssmParameter: /aws/service/eks/optimized-ami/1.35/amazon-linux-2023/x86_64/nvidia/recommended/image_id
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 40Gi
+        volumeType: gp3
+        deleteOnTermination: true

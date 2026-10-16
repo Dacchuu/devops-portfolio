@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eicon-staging
+
+resources:
+  - ../../base
+  - external-secret.yaml
+  - hpa.yaml
+
+patchesStrategicMerge:
+  - tolerations.yaml
+
+configMapGenerator:
+  - name: embedding-config
+    behavior: merge
+    literals:
+      - S3_BUCKET=eicon-shazam-staging-models
+      - CHECKPOINT_PATH=checkpoint.pth
+      - AWS_REGION=us-west-1
+
+images:
+  - name: 491085416489.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-embedding
+    newName: 491085416489.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-embedding
+    newTag: "1432d78"

@@ -1,0 +1,71 @@
+# GitHub Actions workflow (CI/CD) — NOT an ArgoCD manifest.
+# Intended location: eicon_backend/.github/workflows/staging-deploy.yaml
+# CI builds images → pushes ECR → updates newTag in this gitops repo → ArgoCD syncs.
+name: STAGING DEPLOY (GitOps)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+
+  # =========================================================
+  # 1️⃣ BUILD & PUSH IMAGES (UNCHANGED LOGIC)
+  # =========================================================
+  build-and-push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout application repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Build and push Docker images
+        env:
+          AWS_REGION: us-west-1
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          chmod +x build-and-push.sh
+          ./build-and-push.sh
+
+  # =========================================================
+  # 2️⃣ UPDATE GITOPS MANIFEST (THIS IS THE "DEPLOY")
+  # =========================================================
+  update-gitops:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: EiconVision/eicon-gitops
+          token: ${{ secrets.GITOPS_REPO_TOKEN }}
+          ref: main
+
+      - name: Update image tag for staging
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+
+          echo "Updating backend image to tag: $IMAGE_TAG"
+
+          sed -i "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
+            apps/eicon-backend/overlays/staging/kustomization.yaml
+          sed -i "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
+            apps/eicon-embedding/overlays/staging/kustomization.yaml
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add apps/eicon-backend/overlays/staging/kustomization.yaml \
+                  apps/eicon-embedding/overlays/staging/kustomization.yaml
+          git commit -m "deploy(staging): backend+embedding $IMAGE_TAG"
+          git push

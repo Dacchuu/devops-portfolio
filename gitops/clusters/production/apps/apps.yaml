@@ -1,0 +1,97 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-backend-prod
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: production
+    path: apps/eicon-backend/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-production
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: eicon-backend
+      jsonPointers: [/spec/replicas]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-embedding-prod
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: production
+    path: apps/eicon-embedding/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-production
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: eicon-embedding
+      jsonPointers: [/spec/replicas]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-ingress-prod
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: production
+    path: apps/eicon-ingress/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-production
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-ingress-prod
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: production
+    path: apps/argocd/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter-prod
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: production
+    path: apps/karpenter/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: karpenter
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }

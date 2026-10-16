@@ -1,0 +1,207 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-backend-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: staging
+    path: apps/eicon-backend/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: eicon-backend
+      jsonPointers:
+        - /spec/replicas
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-autoscaler-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://kubernetes.github.io/autoscaler
+    chart: cluster-autoscaler
+    targetRevision: 9.57.0
+    helm:
+      values: |
+        cloudProvider: aws
+
+        autoDiscovery:
+          clusterName: eicon-staging-eks
+
+        awsRegion: us-west-1
+
+        rbac:
+          serviceAccount:
+            create: true
+            name: cluster-autoscaler
+            annotations:
+              eks.amazonaws.com/role-arn: arn:aws:iam::491085416489:role/eicon-staging-cluster-autoscaler
+
+        image:
+          repository: registry.k8s.io/autoscaling/cluster-autoscaler
+          tag: v1.35.0
+
+        replicaCount: 1
+
+        extraArgs:
+          expander: least-waste
+          balance-similar-node-groups: "true"
+          scale-down-delay-after-add: 10m
+          scale-down-unneeded-time: 10m
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-embedding-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: staging
+    path: apps/eicon-embedding/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: eicon-embedding
+      jsonPointers:
+        - /spec/replicas
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eicon-ingress-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: staging
+    path: apps/eicon-ingress/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eicon-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-ingress-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: staging
+    path: apps/argocd/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    targetRevision: staging
+    path: apps/karpenter/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: karpenter
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: descheduler-stg
+  namespace: argocd
+spec:
+  project: staging
+  source:
+    repoURL: https://kubernetes-sigs.github.io/descheduler
+    chart: descheduler
+    targetRevision: 0.35.1
+    helm:
+      values: |
+        kind: CronJob
+        schedule: "*/15 * * * *"
+
+        cmdOptions:
+          v: 3
+
+        deschedulerPolicyAPIVersion: "descheduler/v1alpha2"
+        deschedulerPolicy:
+          maxNoOfPodsToEvictPerNode: 1
+          maxNoOfPodsToEvictPerNamespace: 1
+          profiles:
+            - name: default
+              pluginConfig:
+                - name: DefaultEvictor
+                  args:
+                    podProtections:
+                      defaultDisabled:
+                        - "PodsWithLocalStorage"
+                - name: RemovePodsViolatingNodeAffinity
+                  args:
+                    nodeAffinityType:
+                      - preferredDuringSchedulingIgnoredDuringExecution
+              plugins:
+                deschedule:
+                  enabled:
+                    - RemovePodsViolatingNodeAffinity
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: descheduler
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

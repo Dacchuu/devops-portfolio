@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: staging
+  namespace: argocd
+spec:
+  description: Eicon staging apps
+  sourceRepos:
+    - 'https://github.com/EiconVision/eicon-gitops.git'
+    - 'https://kubernetes.github.io/autoscaler'
+    - 'https://kubernetes-sigs.github.io/descheduler'
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: eicon-staging
+    - server: https://kubernetes.default.svc
+      namespace: argocd
+    - server: https://kubernetes.default.svc
+      namespace: karpenter
+    - server: https://kubernetes.default.svc
+      namespace: kube-system
+    - server: https://kubernetes.default.svc
+      namespace: descheduler
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: ConfigMap
+    - group: ''
+      kind: Secret
+    - group: ''
+      kind: Service
+    - group: ''
+      kind: PersistentVolumeClaim
+    - group: ''
+      kind: ServiceAccount
+    - group: apps
+      kind: Deployment
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: external-secrets.io
+      kind: ExternalSecret
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+    - group: policy
+      kind: PodDisruptionBudget
+    - group: rbac.authorization.k8s.io
+      kind: Role
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+    - group: batch
+      kind: CronJob
+  clusterResourceWhitelist:
+    - group: karpenter.sh
+      kind: NodePool
+    - group: karpenter.k8s.aws
+      kind: EC2NodeClass
+    - group: storage.k8s.io
+      kind: StorageClass
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding

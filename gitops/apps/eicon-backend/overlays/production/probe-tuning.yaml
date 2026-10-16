@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eicon-backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            timeoutSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            timeoutSeconds: 10
+            failureThreshold: 5
