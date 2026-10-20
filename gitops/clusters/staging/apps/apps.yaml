@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-backend-stg
+  name: popcorn-backend-stg
   namespace: argocd
 spec:
   project: staging
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: staging
-    path: apps/eicon-backend/overlays/staging
+    path: apps/popcorn-backend/overlays/staging
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-staging
+    namespace: popcorn-staging
   syncPolicy:
     automated:
       prune: true
@@ -21,7 +21,7 @@ spec:
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: eicon-backend
+      name: popcorn-backend
       jsonPointers:
         - /spec/replicas
 ---
@@ -41,7 +41,7 @@ spec:
         cloudProvider: aws
 
         autoDiscovery:
-          clusterName: eicon-staging-eks
+          clusterName: popcorn-staging-eks
 
         awsRegion: us-west-1
 
@@ -50,7 +50,7 @@ spec:
             create: true
             name: cluster-autoscaler
             annotations:
-              eks.amazonaws.com/role-arn: arn:aws:iam::491085416489:role/eicon-staging-cluster-autoscaler
+              eks.amazonaws.com/role-arn: arn:aws:iam::**************:role/popcorn-staging-cluster-autoscaler
 
         image:
           repository: registry.k8s.io/autoscaling/cluster-autoscaler
@@ -74,17 +74,17 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-embedding-stg
+  name: popcorn-embedding-stg
   namespace: argocd
 spec:
   project: staging
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: staging
-    path: apps/eicon-embedding/overlays/staging
+    path: apps/popcorn-embedding/overlays/staging
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-staging
+    namespace: popcorn-staging
   syncPolicy:
     automated:
       prune: true
@@ -94,24 +94,24 @@ spec:
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: eicon-embedding
+      name: popcorn-embedding
       jsonPointers:
         - /spec/replicas
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-ingress-stg
+  name: popcorn-ingress-stg
   namespace: argocd
 spec:
   project: staging
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: staging
-    path: apps/eicon-ingress/overlays/staging
+    path: apps/popcorn-ingress/overlays/staging
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-staging
+    namespace: popcorn-staging
   syncPolicy:
     automated:
       prune: true
@@ -125,7 +125,7 @@ metadata:
 spec:
   project: staging
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: staging
     path: apps/argocd/overlays/staging
   destination:
@@ -146,7 +146,7 @@ metadata:
 spec:
   project: staging
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: staging
     path: apps/karpenter/overlays/staging
   destination:

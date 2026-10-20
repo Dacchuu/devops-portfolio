@@ -3,7 +3,7 @@
 variable "project_name" {
   description = "Project name for tagging and module inputs"
   type        = string
-  default     = "eicon"
+  default     = "popcorn"
 }
 
 variable "environment" {
@@ -16,7 +16,7 @@ variable "environment" {
 variable "terraform_state_bucket" {
   description = "S3 bucket holding Terraform state"
   type        = string
-  default     = "eicon-terraform-state-bucket"
+  default     = "popcorn-terraform-state-bucket"
 }
 
 variable "terraform_state_region" {

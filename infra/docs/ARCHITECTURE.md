@@ -1,10 +1,10 @@
-# Eicon Infrastructure Architecture
+# popcorn Infrastructure Architecture
 
-Terraform-based AWS infrastructure for the Eicon platform.
+Terraform-based AWS infrastructure for the popcorn platform.
 
-For the full platform (infrastructure + GitOps + CI/CD), see [eicon-gitops/docs/PLATFORM_ARCHITECTURE.md](https://github.com/EiconVision/eicon-gitops/blob/main/docs/PLATFORM_ARCHITECTURE.md).
+For the full platform (infrastructure + GitOps + CI/CD), see [popcorn-gitops/docs/PLATFORM_ARCHITECTURE.md](<Repo URL>/blob/main/docs/PLATFORM_ARCHITECTURE.md).
 
-For step-by-step deployment, see [eicon-gitops/docs/STAGING_RUNBOOK.md](https://github.com/EiconVision/eicon-gitops/blob/main/docs/STAGING_RUNBOOK.md).
+For step-by-step deployment, see [popcorn-gitops/docs/STAGING_RUNBOOK.md](<Repo URL>/blob/main/docs/STAGING_RUNBOOK.md).
 
 ---
 
@@ -12,8 +12,8 @@ For step-by-step deployment, see [eicon-gitops/docs/STAGING_RUNBOOK.md](https://
 
 ```mermaid
 flowchart TB
-    INFRA["eicon-infrastructure<br/>Terraform"]
-    GITOPS["eicon-gitops<br/>ArgoCD"]
+    INFRA["popcorn-infrastructure<br/>Terraform"]
+    GITOPS["popcorn-gitops<br/>ArgoCD"]
     APPS["Applications<br/>backend, embedding, ingress"]
 
     INFRA -->|provisions EKS| GITOPS
@@ -27,7 +27,7 @@ This repo owns everything **below** the dashed line — AWS networking, Kubernet
 ## Repository Layout
 
 ```
-eicon-infrastructure/
+popcorn-infrastructure/
 ├── modules/
 │   ├── vpc/          # VPC, subnets, NAT, IGW, security groups
 │   ├── bastion/      # SSH jump host (optional — VPN used instead)
@@ -84,7 +84,7 @@ flowchart TB
 |---|---------|------------|
 | Workload region | `us-west-1` | `us-east-1` |
 | State region | `us-east-1` | `us-east-1` |
-| Cluster | `eicon-staging-eks` | `eicon-production-eks` |
+| Cluster | `popcorn-staging-eks` | `popcorn-production-eks` |
 | VPC CIDR | `172.31.0.0/16` | `172.31.0.0/16` |
 | AZs | `us-west-1a/b` | `us-east-1a/b` |
 | Node type | `g4dn.xlarge` | `g4dn.xlarge` |
@@ -162,7 +162,7 @@ Worker nodes and the EKS control plane live in **private subnets**. NAT gateways
 Configured in `terraform.tfvars`:
 
 ```hcl
-admin_users     = ["arn:aws:iam::491085416489:user/<name>"]
+admin_users     = ["arn:aws:iam::************:user/<name>"]
 developer_users = []
 ```
 
@@ -195,7 +195,7 @@ Storage: EBS gp3 via CSI (Retain reclaim policy).
 
 | Setting | Value |
 |---------|-------|
-| Bucket | `eicon-terraform-state-bucket` |
+| Bucket | `popcorn-terraform-state-bucket` |
 | Region | `us-east-1` |
 | Locking | S3 native lockfiles |
 
@@ -268,8 +268,8 @@ cd environments/staging/monitoring && terraform init && terraform apply -var="gr
 
 | Document | Location |
 |----------|----------|
-| Platform Architecture (full stack) | [eicon-gitops/docs/PLATFORM_ARCHITECTURE.md](https://github.com/EiconVision/eicon-gitops/blob/main/docs/PLATFORM_ARCHITECTURE.md) |
-| Staging Runbook | [eicon-gitops/docs/STAGING_RUNBOOK.md](https://github.com/EiconVision/eicon-gitops/blob/main/docs/STAGING_RUNBOOK.md) |
+| Platform Architecture (full stack) | [popcorn-gitops/docs/PLATFORM_ARCHITECTURE.md](https://github.com/popcornVision/popcorn-gitops/blob/main/docs/PLATFORM_ARCHITECTURE.md) |
+| Staging Runbook | [popcorn-gitops/docs/STAGING_RUNBOOK.md](https://github.com/popcornVision/popcorn-gitops/blob/main/docs/STAGING_RUNBOOK.md) |
 | Environments README | [environments/README.md](../environments/README.md) |
 | Root README | [README.md](../README.md) |
 

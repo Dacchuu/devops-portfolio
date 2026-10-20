@@ -89,7 +89,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(eicon_api_requests_total{job=\"eicon-backend_api\"})",
+          "expr": "sum(popcorn_api_requests_total{job=\"popcorn-backend_api\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -153,7 +153,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(eicon_api_requests_total{job=\"eicon-backend_api\"}[5m])) * 60",
+          "expr": "sum(rate(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[5m])) * 60",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -226,7 +226,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(\n  sum(rate(eicon_api_errors_total{job=\"eicon-backend_api\"}[5m]))\n  /\n  sum(rate(eicon_api_requests_total{job=\"eicon-backend_api\"}[5m]))\n) * 100",
+          "expr": "(\n  sum(rate(popcorn_api_errors_total{job=\"popcorn-backend_api\"}[5m]))\n  /\n  sum(rate(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[5m]))\n) * 100",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -294,7 +294,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(up{job=~\"eicon-backend.*_api\"})",
+          "expr": "sum(up{job=~\"popcorn-backend.*_api\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -401,7 +401,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (route) (rate(eicon_api_requests_total{job=\"eicon-backend_api\"}[5m]))",
+          "expr": "sum by (route) (rate(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[5m]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -556,7 +556,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (status) (rate(eicon_api_requests_total{job=\"eicon-backend_api\"}[5m]))",
+          "expr": "sum by (status) (rate(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[5m]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -618,7 +618,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (status) (increase(eicon_api_requests_total{job=\"eicon-backend_api\"}[1h]))",
+          "expr": "sum by (status) (increase(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[1h]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -728,7 +728,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_api_request_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le, route))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_api_request_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le, route))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -827,7 +827,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum(rate(eicon_api_request_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(popcorn_api_request_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "instant": false,
           "interval": "",
           "legendFormat": "P50",
@@ -840,7 +840,7 @@
             "uid": "ff5o9er2whiioe"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_api_request_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_api_request_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "hide": false,
           "instant": false,
           "legendFormat": "P95",
@@ -854,7 +854,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum(rate(eicon_api_request_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(popcorn_api_request_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "hide": false,
           "instant": false,
           "legendFormat": "P99",
@@ -959,7 +959,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(eicon_api_request_duration_seconds_sum{job=\"eicon-backend_api\"}[5m]))\n/\nsum(rate(eicon_api_request_duration_seconds_count{job=\"eicon-backend_api\"}[5m]))",
+          "expr": "sum(rate(popcorn_api_request_duration_seconds_sum{job=\"popcorn-backend_api\"}[5m]))\n/\nsum(rate(popcorn_api_request_duration_seconds_count{job=\"popcorn-backend_api\"}[5m]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1037,7 +1037,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(eicon_api_requests_total{job=\"eicon-backend_api\", route=\"/api/identify\"}[5m])) * 60",
+          "expr": "sum(rate(popcorn_api_requests_total{job=\"popcorn-backend_api\", route=\"/api/identify\"}[5m])) * 60",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1147,7 +1147,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(eicon_api_requests_total{job=\"eicon-backend_api\", route=\"/api/identify\", status=\"200\"}[5m]))",
+          "expr": "sum(rate(popcorn_api_requests_total{job=\"popcorn-backend_api\", route=\"/api/identify\", status=\"200\"}[5m]))",
           "legendFormat": "Success (200)",
           "range": true,
           "refId": "A"
@@ -1158,7 +1158,7 @@
             "uid": "ff5o9er2whiioe"
           },
           "editorMode": "code",
-          "expr": "sum(rate(eicon_api_requests_total{job=\"eicon-backend_api\", route=\"/api/identify\", status=~\"4..|5..\"}[5m]))",
+          "expr": "sum(rate(popcorn_api_requests_total{job=\"popcorn-backend_api\", route=\"/api/identify\", status=~\"4..|5..\"}[5m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Errors (4xx/5xx)",
@@ -1233,7 +1233,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_api_request_duration_seconds_bucket{job=\"eicon-backend_api\", route=\"/api/identify\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_api_request_duration_seconds_bucket{job=\"popcorn-backend_api\", route=\"/api/identify\"}[5m])) by (le))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1323,7 +1323,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (status) (increase(eicon_api_requests_total{job=\"eicon-backend_api\", route=\"/api/identify\"}[24h]))",
+          "expr": "sum by (status) (increase(popcorn_api_requests_total{job=\"popcorn-backend_api\", route=\"/api/identify\"}[24h]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1410,7 +1410,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_embedding_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_embedding_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1483,7 +1483,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_vector_search_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_vector_search_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1578,7 +1578,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(eicon_embedding_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(popcorn_embedding_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "legendFormat": "P50",
           "range": true,
           "refId": "A"
@@ -1589,7 +1589,7 @@
             "uid": "ff5o9er2whiioe"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_embedding_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_embedding_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "hide": false,
           "instant": false,
           "legendFormat": "P95",
@@ -1686,7 +1686,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(eicon_vector_search_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(popcorn_vector_search_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "legendFormat": "P50",
           "range": true,
           "refId": "A"
@@ -1697,7 +1697,7 @@
             "uid": "ff5o9er2whiioe"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(eicon_vector_search_duration_seconds_bucket{job=\"eicon-backend_api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(popcorn_vector_search_duration_seconds_bucket{job=\"popcorn-backend_api\"}[5m])) by (le))",
           "hide": false,
           "instant": false,
           "legendFormat": "P95",
@@ -1784,7 +1784,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(eicon_confidence_score_sum{job=\"eicon-backend_api\"}[5m]))\n/\nsum(rate(eicon_confidence_score_count{job=\"eicon-backend_api\"}[5m]))",
+          "expr": "sum(rate(popcorn_confidence_score_sum{job=\"popcorn-backend_api\"}[5m]))\n/\nsum(rate(popcorn_confidence_score_count{job=\"popcorn-backend_api\"}[5m]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1865,7 +1865,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(increase(eicon_confidence_score_bucket{job=\"eicon-backend_api\"}[2d])) by (le)",
+          "expr": "sum(increase(popcorn_confidence_score_bucket{job=\"popcorn-backend_api\"}[2d])) by (le)",
           "format": "time_series",
           "instant": false,
           "legendFormat": "{{le}}",
@@ -1941,7 +1941,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, sum by (route) (increase(eicon_api_requests_total{job=\"eicon-backend_api\"}[1h])))",
+          "expr": "topk(10, sum by (route) (increase(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[1h])))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2003,7 +2003,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (method) (increase(eicon_api_requests_total{job=\"eicon-backend_api\"}[1h]))",
+          "expr": "sum by (method) (increase(popcorn_api_requests_total{job=\"popcorn-backend_api\"}[1h]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2075,7 +2075,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "count(count by (route) (eicon_api_requests_total{job=\"eicon-backend_api\"}))",
+          "expr": "count(count by (route) (popcorn_api_requests_total{job=\"popcorn-backend_api\"}))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2097,7 +2097,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Eicon API Monitoring – /api/identify",
+  "title": "popcorn API Monitoring – /api/identify",
   "uid": "adfjcr5",
   "version": 18
 }

@@ -24,7 +24,7 @@ provider "aws" {
   default_tags {
     tags = {
       Environment = "production"
-      Project     = "eicon"
+      Project     = "popcorn"
       Component   = "monitoring"
       ManagedBy   = "terraform"
     }

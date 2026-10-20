@@ -5,7 +5,7 @@ run "validate_eks_basic" {
   variables {
 
     # REQUIRED MODULE VARIABLES
-    project_name = "eicon"
+    project_name = "popcorn"
     environment  = "staging"
     region       = "us-east-1"
 
@@ -13,7 +13,7 @@ run "validate_eks_basic" {
     private_subnet_ids = ["subnet-11111111", "subnet-22222222"]
 
     # EKS CONFIG
-    cluster_name    = "eicon-staging"
+    cluster_name    = "popcorn-staging"
     cluster_version = "1.35"
 
     cluster_endpoint_private_access      = true
@@ -41,7 +41,7 @@ run "validate_eks_basic" {
 
   # Validate cluster name
   assert {
-    condition     = aws_eks_cluster.main.name == "eicon-staging-eks"
+    condition     = aws_eks_cluster.main.name == "popcorn-staging-eks"
     error_message = "EKS cluster name mismatch"
   }
 

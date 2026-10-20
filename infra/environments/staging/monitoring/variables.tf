@@ -1,7 +1,7 @@
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "eicon-staging-eks"
+  default     = "popcorn-staging-eks"
 }
 
 variable "aws_region" {
@@ -146,5 +146,5 @@ variable "storage_iops" {
 variable "gpu_dashboard_default_namespace" {
   description = "Default application namespace selected in the shared GPU dashboard."
   type        = string
-  default     = "eicon-staging"
+  default     = "popcorn-staging"
 }

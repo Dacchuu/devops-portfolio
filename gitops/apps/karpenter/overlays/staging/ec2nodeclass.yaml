@@ -3,13 +3,13 @@ kind: EC2NodeClass
 metadata:
   name: staging-general
 spec:
-  role: KarpenterNodeRole-eicon-staging-eks
+  role: KarpenterNodeRole-popcorn-staging-eks
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: eicon-staging-eks
+        karpenter.sh/discovery: popcorn-staging-eks
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: eicon-staging-eks
+        karpenter.sh/discovery: popcorn-staging-eks
   amiSelectorTerms:
     - alias: al2023@latest
   blockDeviceMappings:

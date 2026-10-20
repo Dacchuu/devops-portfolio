@@ -8,7 +8,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "eicon"
+  default     = "popcorn"
 }
 
 variable "environment" {
@@ -37,7 +37,7 @@ variable "bastion_ssh_cidr_blocks" {
 variable "key_pair_name" {
   description = "SSH key pair name"
   type        = string
-  default     = "eicon"
+  default     = "popcorn"
 }
 
 variable "devops_ssh_keys" {

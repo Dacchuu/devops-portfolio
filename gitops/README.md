@@ -1,6 +1,6 @@
-# Eicon GitOps
+# Popcorn GitOps
 
-Eicon GitOps manages application deployments to Kubernetes using the ArgoCD App-of-Apps model.
+popcorn GitOps manages application deployments to Kubernetes using the ArgoCD App-of-Apps model.
 
 This repository ensures:
 
@@ -35,7 +35,7 @@ https://localhost:8080
 Go to:
 
 ```
-eicon-gitops/bootstrap/
+popcorn-gitops/bootstrap/
 ```
 
 Apply root app:
@@ -66,13 +66,13 @@ kubectl get applications -n argocd
 Check workloads:
 
 ```bash
-kubectl get pods -n eicon-staging
+kubectl get pods -n popcorn-staging
 ```
 
 You should see:
 
-- eicon-backend
-- eicon-embedding
+- popcorn-backend
+- popcorn-embedding
 - ingress components
 
 ---
@@ -93,7 +93,7 @@ nvidia.com/gpu: 1
 
 # Making Changes
 
-1. Modify manifests in **eicon-gitops**
+1. Modify manifests in **popcorn-gitops**
 2. Commit & push
 3. ArgoCD auto-syncs
 4. Pods roll automatically
@@ -108,11 +108,11 @@ Steady state: **1 GPU + 1 CPU**. Full weekend shutdown:
 
 ```bash
 export AWS_REGION=us-west-1
-export CLUSTER_NAME=eicon-staging-eks
+export CLUSTER_NAME=popcorn-staging-eks
 
-aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name eicon-gpu-ng --scaling-config minSize=0,maxSize=3,desiredSize=0 --region "$AWS_REGION"
-aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name eicon-cpu-ng --scaling-config minSize=0,maxSize=2,desiredSize=0 --region "$AWS_REGION"
-aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name eicon-cpu-az1-ng --scaling-config minSize=0,maxSize=1,desiredSize=0 --region "$AWS_REGION"
+aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name popcorn-gpu-ng --scaling-config minSize=0,maxSize=3,desiredSize=0 --region "$AWS_REGION"
+aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name popcorn-cpu-ng --scaling-config minSize=0,maxSize=2,desiredSize=0 --region "$AWS_REGION"
+aws eks update-nodegroup-config --cluster-name "$CLUSTER_NAME" --nodegroup-name popcorn-cpu-az1-ng --scaling-config minSize=0,maxSize=1,desiredSize=0 --region "$AWS_REGION"
 kubectl patch nodepool staging-general --type merge -p '{"spec":{"limits":{"cpu":"0"}}}'
 
 aws rds stop-db-instance --db-instance-identifier staging-database --region "$AWS_REGION"
@@ -192,4 +192,4 @@ You now have:
 - Automated release flow
 - Scalable AI workload platform
 
-**🚀Welcome to Eicon Platform 🚀**
+**🚀Welcome to popcorn Platform 🚀**

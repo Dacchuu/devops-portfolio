@@ -1,8 +1,8 @@
 # Quick Reference
 
-Daily commands for the Eicon staging platform.
+Daily commands for the popcorn staging platform.
 
-**Account:** `**********89` | **Region:** `us-west-1` | **Cluster:** `eicon-staging-eks` | **Namespace:** `eicon-staging`
+**Account:** `**********89` | **Region:** `us-west-1` | **Cluster:** `popcorn-staging-eks` | **Namespace:** `popcorn-staging`
 
 ---
 
@@ -11,7 +11,7 @@ Daily commands for the Eicon staging platform.
 EKS tokens expire every ~15 minutes. Refresh with:
 
 ```bash
-aws eks update-kubeconfig --region us-west-1 --name eicon-staging-eks
+aws eks update-kubeconfig --region us-west-1 --name popcorn-staging-eks
 ```
 
 Verify:
@@ -27,28 +27,28 @@ kubectl get nodes
 ```bash
 # Cluster health
 kubectl get nodes -o custom-columns='NAME:.metadata.name,TYPE:.metadata.labels.node-type,INSTANCE:.metadata.labels.node\.kubernetes\.io/instance-type'
-kubectl get pods -n eicon-staging -o wide
-kubectl get hpa -n eicon-staging
+kubectl get pods -n popcorn-staging -o wide
+kubectl get hpa -n popcorn-staging
 kubectl get pods -A
 
 # Deployments
-kubectl get deployments -n eicon-staging
-kubectl rollout status deployment/eicon-backend -n eicon-staging
-kubectl rollout status deployment/eicon-embedding -n eicon-staging
+kubectl get deployments -n popcorn-staging
+kubectl rollout status deployment/popcorn-backend -n popcorn-staging
+kubectl rollout status deployment/popcorn-embedding -n popcorn-staging
 
 # Health
-curl -s https://staging.eicon.io/health
+curl -s https://staging.popcorn.io/health
 
 # Logs
-kubectl logs -f deployment/eicon-backend -n eicon-staging
-kubectl logs -f deployment/eicon-embedding -n eicon-staging
+kubectl logs -f deployment/popcorn-backend -n popcorn-staging
+kubectl logs -f deployment/popcorn-embedding -n popcorn-staging
 
 # Restart a deployment
-kubectl rollout restart deployment/eicon-backend -n eicon-staging
-kubectl rollout restart deployment/eicon-embedding -n eicon-staging
+kubectl rollout restart deployment/popcorn-backend -n popcorn-staging
+kubectl rollout restart deployment/popcorn-embedding -n popcorn-staging
 
 # Describe a pod (for crash debugging)
-kubectl describe pod -l app=eicon-backend -n eicon-staging
+kubectl describe pod -l app=popcorn-backend -n popcorn-staging
 ```
 
 Steady state: **1 GPU + 1 CPU**. Backend and embedding share the GPU node. Backend uploads use EFS (multi-AZ). See `docs/DAILY_OPERATIONS_CHEATSHEET.md` for weekend cost control, autoscaling, and EFS checks.
@@ -57,7 +57,7 @@ Steady state: **1 GPU + 1 CPU**. Backend and embedding share the GPU node. Backe
 ## Build & Push to ECR from Local
 
 ```bash
-cd /Users/user-name/cloned-remote-repository/eicon_backend
+cd /Users/user-name/cloned-remote-repository/popcorn_backend
 
 export AWS_REGION=us-west-1
 export AWS_ACCOUNT_ID=**********89
@@ -66,8 +66,8 @@ export AWS_ACCOUNT_ID=**********89
 ```
 
 ECR repos:
-- `**********89.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-backend`
-- `**********89.dkr.ecr.us-west-1.amazonaws.com/eicon-shazam-embedding`
+- `**********89.dkr.ecr.us-west-1.amazonaws.com/popcorn-shazam-backend`
+- `**********89.dkr.ecr.us-west-1.amazonaws.com/popcorn-shazam-embedding`
 
 > First build takes 15–20 min (PyTorch/CUDA layers). Re-runs are fast due to layer cache.
 
@@ -78,17 +78,17 @@ ECR repos:
 After a build, update the tag so ArgoCD rolls it out:
 
 ```bash
-cd /Users/user-name/cloned-remote-repository/eicon-gitops
+cd /Users/user-name/cloned-remote-repository/popcorn-gitops
 
-IMAGE_TAG=$(cd /Users/user-name/cloned-remote-repository/eicon_backend && git rev-parse --short HEAD)
+IMAGE_TAG=$(cd /Users/user-name/cloned-remote-repository/popcorn_backend && git rev-parse --short HEAD)
 
 sed -i '' "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
-  apps/eicon-backend/overlays/staging/kustomization.yaml
+  apps/popcorn-backend/overlays/staging/kustomization.yaml
 sed -i '' "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
-  apps/eicon-embedding/overlays/staging/kustomization.yaml
+  apps/popcorn-embedding/overlays/staging/kustomization.yaml
 
-git add apps/eicon-backend/overlays/staging/kustomization.yaml \
-        apps/eicon-embedding/overlays/staging/kustomization.yaml
+git add apps/popcorn-backend/overlays/staging/kustomization.yaml \
+        apps/popcorn-embedding/overlays/staging/kustomization.yaml
 git commit -m "deploy(staging): backend+embedding $IMAGE_TAG"
 git push
 ```
@@ -105,7 +105,7 @@ ssh -i ~/.ssh/id_rsa ec2-user@$(cd tf/staging/vpc && terraform output -raw basti
 
 ## Setup (One Time)
 
-Run from [eicon-infrastructure](https://github.com/EiconVision/eicon-infrastructure/blob/main/README.md).
+Run from [popcorn-infrastructure](https://github.com/popcornVision/popcorn-infrastructure/blob/main/README.md).
 
 ```bash
 # VPC
@@ -115,7 +115,7 @@ cd environments/staging/vpc && terraform apply
 cd environments/staging/eks && terraform apply
 
 # kubeconfig
-aws eks update-kubeconfig --region us-west-1 --name eicon-staging-eks
+aws eks update-kubeconfig --region us-west-1 --name popcorn-staging-eks
 
 # Import SSH key
 aws ec2 import-key-pair --region us-west-1 --key-name xyz_asign \
@@ -130,7 +130,7 @@ aws ec2 import-key-pair --region us-west-1 --key-name xyz_asign \
 # Get their IAM ARN
 aws iam get-user --user-name <username> --query User.Arn
 
-# Add to eicon-infrastructure/environments/staging/eks/terraform.tfvars
+# Add to popcorn-infrastructure/environments/staging/eks/terraform.tfvars
 admin_users = ["arn:aws:iam::**********89:user/DevOps", "arn:aws:iam::**********89:user/<new-user>"]
 
 terraform apply
@@ -142,7 +142,7 @@ terraform apply
 
 ### kubectl credentials error?
 ```bash
-aws eks update-kubeconfig --region us-west-1 --name eicon-staging-eks
+aws eks update-kubeconfig --region us-west-1 --name popcorn-staging-eks
 ```
 
 ### Wrong AWS identity / profile?
@@ -156,7 +156,7 @@ export AWS_PROFILE=default
 ```bash
 # Check the tag exists in ECR
 aws ecr describe-images \
-  --repository-name eicon-shazam-backend \
+  --repository-name popcorn-shazam-backend \
   --region us-west-1 \
   --query 'sort_by(imageDetails,&imagePushedAt)[-1].imageTags'
 ```
@@ -216,12 +216,12 @@ git push origin staging
 # wait for cluster-autoscaler-stg to show Synced, and its pod gone from kube-system
 
 # 3. Scale both managed node group floors down. maxSize=1, not 0 — AWS rejects 0.
-aws eks update-nodegroup-config --cluster-name eicon-staging-eks \
-  --nodegroup-name eicon-cpu-ng-v2 \
+aws eks update-nodegroup-config --cluster-name popcorn-staging-eks \
+  --nodegroup-name popcorn-cpu-ng-v2 \
   --scaling-config minSize=0,maxSize=1,desiredSize=0 --region us-west-1
 
-aws eks update-nodegroup-config --cluster-name eicon-staging-eks \
-  --nodegroup-name eicon-gpu-ng \
+aws eks update-nodegroup-config --cluster-name popcorn-staging-eks \
+  --nodegroup-name popcorn-gpu-ng \
   --scaling-config minSize=0,maxSize=1,desiredSize=0 --region us-west-1
 
 # 4. Optional — stop RDS too (AWS auto-restarts it after 7 days if left stopped, so
@@ -240,12 +240,12 @@ are at 0.
 # 1. Node group floors FIRST — this brings back the nodes that host ArgoCD, CoreDNS,
 #    Karpenter's controller, and Cluster Autoscaler. Everything reschedules automatically
 #    once nodes are Ready — their Deployments/DaemonSets never went away, only their pods did.
-aws eks update-nodegroup-config --cluster-name eicon-staging-eks \
-  --nodegroup-name eicon-cpu-ng-v2 \
+aws eks update-nodegroup-config --cluster-name popcorn-staging-eks \
+  --nodegroup-name popcorn-cpu-ng-v2 \
   --scaling-config minSize=2,maxSize=6,desiredSize=2 --region us-west-1
 
-aws eks update-nodegroup-config --cluster-name eicon-staging-eks \
-  --nodegroup-name eicon-gpu-ng \
+aws eks update-nodegroup-config --cluster-name popcorn-staging-eks \
+  --nodegroup-name popcorn-gpu-ng \
   --scaling-config minSize=1,maxSize=6,desiredSize=1 --region us-west-1
 
 kubectl get nodes -w   # wait for 3 nodes Ready, then Ctrl-C
@@ -270,7 +270,7 @@ aws rds start-db-instance --db-instance-identifier staging-database --region us-
 
 # 4. Confirm everything's back
 kubectl get applications -n argocd -o custom-columns='NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status'
-kubectl get deploy eicon-backend eicon-embedding -n eicon-staging
+kubectl get deploy popcorn-backend popcorn-embedding -n popcorn-staging
 ```
 
 Note: the `aws eks update-nodegroup-config` calls above are a live, fast toggle — they don't go

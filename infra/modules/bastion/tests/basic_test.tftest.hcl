@@ -4,13 +4,13 @@ run "validate_bastion_basic" {
   command = plan
 
   variables {
-    project_name = "eicon"
+    project_name = "popcorn"
     environment  = "staging"
 
     vpc_id             = "vpc-*********"
     public_subnet_id   = "subnet-***********"
     create_key_pair    = false
-    existing_key_name  = "eicon-test"
+    existing_key_name  = "popcorn-test"
     devops_ssh_keys    = []
     allocate_eip       = true
     bastion_ssh_cidr_blocks = ["203.0.113.0/24"]

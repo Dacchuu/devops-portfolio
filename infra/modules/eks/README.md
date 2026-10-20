@@ -28,11 +28,11 @@ Example:
 module "eks" {
   source = "../../modules/eks"
 
-  project_name = "eicon"
+  project_name = "popcorn"
   environment  = "production"
 
   # Required inputs — set per environment
-  cluster_name = "eicon-production"
+  cluster_name = "popcorn-production"
   region       = "us-east-1"
 
   vpc_id             = module.vpc.vpc_id

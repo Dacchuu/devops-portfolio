@@ -51,12 +51,12 @@
             "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "code",
-          "expr": "{namespace=\"eicon-staging\", app=\"eicon-backend\"}",
+          "expr": "{namespace=\"popcorn-staging\", app=\"popcorn-backend\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "eicon-backend",
+      "title": "popcorn-backend",
       "type": "logs"
     },
     {
@@ -89,12 +89,12 @@
             "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "code",
-          "expr": "{namespace=\"eicon-staging\", app=\"eicon-embedding\"}",
+          "expr": "{namespace=\"popcorn-staging\", app=\"popcorn-embedding\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "eicon-embedding",
+      "title": "popcorn-embedding",
       "type": "logs"
     }
   ],

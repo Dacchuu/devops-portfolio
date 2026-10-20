@@ -1,5 +1,5 @@
 # GitHub Actions workflow (CI/CD) — NOT an ArgoCD manifest.
-# Intended location: eicon_backend/.github/workflows/staging-deploy.yaml
+# Intended location: popcorn_backend/.github/workflows/staging-deploy.yaml
 # CI builds images → pushes ECR → updates newTag in this gitops repo → ArgoCD syncs.
 name: STAGING DEPLOY (GitOps)
 
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout GitOps repository
         uses: actions/checkout@v4
         with:
-          repository: EiconVision/eicon-gitops
+          repository: popcornVision/popcorn-gitops
           token: ${{ secrets.GITOPS_REPO_TOKEN }}
           ref: main
 
@@ -58,14 +58,14 @@ jobs:
           echo "Updating backend image to tag: $IMAGE_TAG"
 
           sed -i "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
-            apps/eicon-backend/overlays/staging/kustomization.yaml
+            apps/popcorn-backend/overlays/staging/kustomization.yaml
           sed -i "s/newTag:.*/newTag: \"$IMAGE_TAG\"/" \
-            apps/eicon-embedding/overlays/staging/kustomization.yaml
+            apps/popcorn-embedding/overlays/staging/kustomization.yaml
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add apps/eicon-backend/overlays/staging/kustomization.yaml \
-                  apps/eicon-embedding/overlays/staging/kustomization.yaml
+          git add apps/popcorn-backend/overlays/staging/kustomization.yaml \
+                  apps/popcorn-embedding/overlays/staging/kustomization.yaml
           git commit -m "deploy(staging): backend+embedding $IMAGE_TAG"
           git push

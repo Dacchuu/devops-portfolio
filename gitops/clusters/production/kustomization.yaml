@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespaces/eicon-production.yaml
+  - namespaces/popcorn-production.yaml
   - appprojects.yaml
   - apps/apps.yaml

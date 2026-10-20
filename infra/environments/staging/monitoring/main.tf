@@ -25,7 +25,7 @@ provider "aws" {
   default_tags {
     tags = {
       Environment = "staging"
-      Project     = "eicon"
+      Project     = "popcorn"
       Component   = "monitoring"
       ManagedBy   = "terraform"
     }
@@ -124,10 +124,10 @@ module "monitoring" {
 
   gpu_dashboard_default_namespace = var.gpu_dashboard_default_namespace
 
-  # eicon-gpu-ng carries a nvidia.com/gpu=present:NoSchedule taint (see
-  # eicon-infrastructure modules/eks) that neither chart tolerates by
+  # popcorn-gpu-ng carries a nvidia.com/gpu=present:NoSchedule taint (see
+  # popcorn-infrastructure modules/eks) that neither chart tolerates by
   # default, so dcgm-exporter and promtail never land on the node running
-  # eicon-backend/eicon-embedding.
+  # popcorn-backend/popcorn-embedding.
   dcgm_tolerations = [
     { key = "nvidia.com/gpu", operator = "Equal", value = "present", effect = "NoSchedule" }
   ]

@@ -1,6 +1,6 @@
-# Eicon Infrastructure (Terraform)
+# popcorn Infrastructure (Terraform)
 
-This repository contains the Infrastructure as Code (IaC) used to provision and manage the **Eicon platform infrastructure on AWS** using **Terraform**.
+This repository contains the Infrastructure as Code (IaC) used to provision and manage the **popcorn platform infrastructure on AWS** using **Terraform**.
 
 The infrastructure is structured using **modular Terraform architecture**, allowing reusable modules and environment-specific configurations.
 
@@ -37,7 +37,7 @@ AWS
 # Repository Structure
 
 ```
-eicon-infrastructure
+popcorn-infrastructure
 │
 ├── modules
 │   ├── vpc
@@ -96,7 +96,7 @@ Each environment composes modules to provision complete infrastructure.
 
 Terraform remote state is stored in:
 ```
-S3 Bucket: eicon-terraform-state-bucket
+S3 Bucket: popcorn-terraform-state-bucket
 ```
 State structure:
 ```

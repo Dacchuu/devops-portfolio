@@ -48,7 +48,7 @@ resource "kubernetes_secret_v1" "grafana_credentials" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "loki_logs" {
-  bucket = "eicon-${var.environment}-loki-logs-${data.aws_caller_identity.current.account_id}"
+  bucket = "popcorn-${var.environment}-loki-logs-${data.aws_caller_identity.current.account_id}"
 }
 
 resource "aws_s3_bucket_public_access_block" "loki_logs" {
@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "loki_s3_assume_role" {
 }
 
 resource "aws_iam_role" "loki_s3" {
-  name               = "eicon-${var.environment}-loki-s3"
+  name               = "popcorn-${var.environment}-loki-s3"
   assume_role_policy = data.aws_iam_policy_document.loki_s3_assume_role.json
 }
 
@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "loki_s3" {
 }
 
 resource "aws_iam_role_policy" "loki_s3" {
-  name   = "eicon-${var.environment}-loki-s3"
+  name   = "popcorn-${var.environment}-loki-s3"
   role   = aws_iam_role.loki_s3.id
   policy = data.aws_iam_policy_document.loki_s3.json
 }
@@ -142,7 +142,7 @@ resource "aws_iam_role_policy" "loki_s3" {
 # blocks to S3.
 # ----------------------------
 resource "aws_s3_bucket" "thanos_blocks" {
-  bucket = "eicon-${var.environment}-thanos-blocks-${data.aws_caller_identity.current.account_id}"
+  bucket = "popcorn-${var.environment}-thanos-blocks-${data.aws_caller_identity.current.account_id}"
 }
 
 resource "aws_s3_bucket_public_access_block" "thanos_blocks" {
@@ -196,7 +196,7 @@ data "aws_iam_policy_document" "prometheus_s3_assume_role" {
 }
 
 resource "aws_iam_role" "prometheus_s3" {
-  name               = "eicon-${var.environment}-prometheus-s3"
+  name               = "popcorn-${var.environment}-prometheus-s3"
   assume_role_policy = data.aws_iam_policy_document.prometheus_s3_assume_role.json
 }
 
@@ -224,7 +224,7 @@ data "aws_iam_policy_document" "prometheus_s3" {
 }
 
 resource "aws_iam_role_policy" "prometheus_s3" {
-  name   = "eicon-${var.environment}-prometheus-s3"
+  name   = "popcorn-${var.environment}-prometheus-s3"
   role   = aws_iam_role.prometheus_s3.id
   policy = data.aws_iam_policy_document.prometheus_s3.json
 }
@@ -293,7 +293,7 @@ resource "helm_release" "prometheus" {
           prometheusSpec = merge(
             {
               externalLabels = {
-                cluster = "eicon-${var.environment}"
+                cluster = "popcorn-${var.environment}"
               }
               thanos = {
                 objectStorageConfig = {
@@ -552,7 +552,7 @@ resource "kubernetes_config_map_v1" "gpu_dashboard" {
   count = !var.test_mode && var.enable_gpu_dashboard ? 1 : 0
 
   metadata {
-    name      = "grafana-dashboard-eicon-gpu"
+    name      = "grafana-dashboard-popcorn-gpu"
     namespace = kubernetes_namespace_v1.monitoring.metadata[0].name
     labels = {
       grafana_dashboard = "1"
@@ -560,7 +560,7 @@ resource "kubernetes_config_map_v1" "gpu_dashboard" {
   }
 
   data = {
-    "eicon-gpu-dashboard.json" = templatefile("${path.module}/dashboards/eicon-gpu-dashboard.json.tftpl", {
+    "popcorn-gpu-dashboard.json" = templatefile("${path.module}/dashboards/popcorn-gpu-dashboard.json.tftpl", {
       gpu_dashboard_default_namespace = var.gpu_dashboard_default_namespace
     })
   }

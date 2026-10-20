@@ -11,10 +11,10 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/group.name: argocd
     alb.ingress.kubernetes.io/healthcheck-path: /health
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-1:491085416489:certificate/07c5f509-3a4a-4a0b-a809-08bcf658185e
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:**********:certificate
 spec:
   rules:
-    - host: staging-argocd.eicon.io
+    - host: staging-argocd.popcorn.io
       http:
         paths:
           - path: /

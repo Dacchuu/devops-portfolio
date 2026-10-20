@@ -14,7 +14,7 @@ terraform {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket        = "eicon-terraform-state-bucket"
+    bucket        = "popcorn-terraform-state-bucket"
     key           = "environments/production/vpc/terraform.tfstate"
     region        = var.aws_region
     use_lockfile  = true

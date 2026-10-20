@@ -1,12 +1,12 @@
-# Eicon Production (EKS) — Architecture & Setup Reference
+# popcorn Production (EKS) — Architecture & Setup Reference
 
 A single reference for the new EKS-based production platform: AWS infrastructure (Terraform),
 GitOps (Argo CD), the CI/CD pipeline, and every real bug found and fixed while standing it up.
 
 *Last consolidated: 2026-10-12.*
 
-**Status: validating on `test.eicon.io`.** The live, real-traffic system today is still the
-original **EC2 + Docker** deployment on `api.eicon.io`. This EKS platform runs **alongside** it,
+**Status: validating on `test.popcorn.io`.** The live, real-traffic system today is still the
+original **EC2 + Docker** deployment on `api.popcorn.io`. This EKS platform runs **alongside** it,
 in the same AWS account and region, sharing the same RDS/S3/Qdrant data, so it can be proven out
 end-to-end before any DNS cutover. See [§10](#10-production-cutover-ec2--eks) for the cutover
 plan — nothing in this document implies the cutover has happened.
@@ -36,21 +36,21 @@ plan — nothing in this document implies the cutover has happened.
 
 | Item | Value |
 |---|---|
-| AWS account | `491085416489` |
+| AWS account | `************` |
 | Region | `us-east-1` |
-| EKS cluster | `eicon-production-eks` (v1.35, `API_AND_CONFIG_MAP` auth mode) |
-| VPC | `vpc-020343d82749251ef` (`eicon-production-vpc`, CIDR `10.60.0.0/16`) |
-| App endpoint (validation) | `https://test.eicon.io` |
-| App endpoint (live, pre-cutover) | `https://api.eicon.io` (EC2 + Docker, unaffected by any of this) |
-| Argo CD UI | `https://production-argocd.eicon.io` |
-| Grafana | `https://k8s.grafana.eicon.io` |
-| GitOps repo / branch | `eicon-gitops` / `production` |
-| App repo | `eicon-backend` (`eicon_backend`) |
-| Namespace | `eicon-production` |
-| Shared secret | AWS Secrets Manager `eicon/backend/credentials` (us-east-1) — same secret the EC2 production app uses |
+| EKS cluster | `popcorn-production-eks` (v1.35, `API_AND_CONFIG_MAP` auth mode) |
+| VPC | `vpc-020343d82749251ef` (`popcorn-production-vpc`, CIDR `10.60.0.0/16`) |
+| App endpoint (validation) | `https://test.popcorn.io` |
+| App endpoint (live, pre-cutover) | `https://api.popcorn.io` (EC2 + Docker, unaffected by any of this) |
+| Argo CD UI | `https://production-argocd.popcorn.io` |
+| Grafana | `https://k8s.grafana.popcorn.io` |
+| GitOps repo / branch | `popcorn-gitops` / `production` |
+| App repo | `popcorn-backend` (`popcorn_backend`) |
+| Namespace | `popcorn-production` |
+| Shared secret | AWS Secrets Manager `popcorn/backend/credentials` (us-east-1) — same secret the EC2 production app uses |
 
 ```bash
-aws eks update-kubeconfig --name eicon-production-eks --region us-east-1
+aws eks update-kubeconfig --name popcorn-production-eks --region us-east-1
 kubectl get applications -n argocd -o custom-columns='NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status'
 ```
 
@@ -58,7 +58,7 @@ kubectl get applications -n argocd -o custom-columns='NAME:.metadata.name,SYNC:.
 
 ## 2. Network layer
 
-- **VPC**: `eicon-production-vpc` (`10.60.0.0/16`) — deliberately a different CIDR from the
+- **VPC**: `popcorn-production-vpc` (`10.60.0.0/16`) — deliberately a different CIDR from the
   pre-existing EC2/RDS default VPC (`vpc-0fc2a8af2414a1386`, `172.31.0.0/16`) to avoid collision.
   - Public subnets: `10.60.10.0/24` (us-east-1a), `10.60.11.0/24` (us-east-1b)
   - Private subnets: `10.60.20.0/24` (us-east-1a), `10.60.21.0/24` (us-east-1b)
@@ -86,7 +86,7 @@ Two distinct compute tiers, each with a different scaling story — do not confl
 
 | | |
 |---|---|
-| Name | `eicon-production-system-ng` |
+| Name | `popcorn-production-system-ng` |
 | Instance type | `t3.medium` |
 | Min / Desired / Max | 2 / 2 / 3 |
 | Labels | `node-type: system` |
@@ -106,8 +106,8 @@ consolidation after 60s idle:
 
 | NodePool | Instance family/size | Capacity type | CPU limit | Taint | Hosts |
 |---|---|---|---|---|---|
-| `production-general` | `m6i.large`/`xlarge` | on-demand | 40 | — | `eicon-backend` |
-| `production-gpu` | `g4dn.xlarge` | on-demand | 16 | `nvidia.com/gpu=present:NoSchedule` | `eicon-embedding` |
+| `production-general` | `m6i.large`/`xlarge` | on-demand | 40 | — | `popcorn-backend` |
+| `production-gpu` | `g4dn.xlarge` | on-demand | 16 | `nvidia.com/gpu=present:NoSchedule` | `popcorn-embedding` |
 
 **Deliberately Karpenter-only for workload capacity** — no second autoscaler (e.g. Cluster
 Autoscaler) runs alongside it here. Staging's documented Karpenter-vs-Cluster-Autoscaler race
@@ -116,7 +116,7 @@ decision: two autoscalers reacting to the same pending-pod signal caused strande
 staging. Production sidesteps that entirely by not having a second one.
 
 Both NodePools reference an `EC2NodeClass` of the same name — AL2023, `karpenter.sh/discovery:
-eicon-production-eks` tag-based subnet/SG selection, gp3 root volume (20Gi general / 40Gi GPU).
+popcorn-production-eks` tag-based subnet/SG selection, gp3 root volume (20Gi general / 40Gi GPU).
 The GPU `EC2NodeClass` pins the NVIDIA-optimized AMI via SSM parameter
 (`/aws/service/eks/optimized-ami/1.35/amazon-linux-2023/x86_64/nvidia/recommended/image_id`).
 
@@ -150,7 +150,7 @@ GitOps-managed.
 - **EFS CSI driver** is an EKS addon (`aws-efs-csi-driver`), not installed by default — had to be
   added explicitly via `aws eks create-addon`, with its own IRSA role
   (`AmazonEKS_EFS_CSI_DriverRole-production`) bound to the `efs-csi-controller-sa` service account.
-- `eicon-backend`'s EFS PVC (`backend-uploads-efs`) uses RWX access for shared upload storage
+- `popcorn-backend`'s EFS PVC (`backend-uploads-efs`) uses RWX access for shared upload storage
   across backend replicas, same pattern as staging.
 - `StorageClass.parameters` (e.g. `fileSystemId`) are **immutable** on an existing object — fixing
   a wrong value requires `kubectl delete storageclass` and letting Argo CD recreate it from
@@ -161,12 +161,12 @@ GitOps-managed.
 ## 5. Secrets & IRSA
 
 **Deliberate decision**: production EKS reuses the *same* Secrets Manager secret the EC2
-production app already uses — `eicon/backend/credentials` (us-east-1) — rather than creating a
-parallel `eicon/production/backend/credentials`. Both `eicon-backend` and `eicon-embedding`
+production app already uses — `popcorn/backend/credentials` (us-east-1) — rather than creating a
+parallel `popcorn/production/backend/credentials`. Both `popcorn-backend` and `popcorn-embedding`
 External Secrets point at this one secret.
 
 ```bash
-kubectl get externalsecret -n eicon-production
+kubectl get externalsecret -n popcorn-production
 # backend-secrets, embedding-secrets — both ClusterSecretStore aws-secretsmanager, refresh 1h
 ```
 
@@ -177,9 +177,9 @@ keys to the shared secret:
 
 | Role | Bound to | Purpose |
 |---|---|---|
-| `eicon-production-backend-irsa-role` | `eicon-production` namespace's `default` ServiceAccount | S3 (uploads/thumbnails/query images/models), SQS (`eicon-s3-upload-worker`), CloudWatch log streams + `PutMetricData` (scoped to `Eicon/S3Upload` namespace condition) |
+| `popcorn-production-backend-irsa-role` | `popcorn-production` namespace's `default` ServiceAccount | S3 (uploads/thumbnails/query images/models), SQS (`popcorn-s3-upload-worker`), CloudWatch log streams + `PutMetricData` (scoped to `popcorn/S3Upload` namespace condition) |
 | `AmazonEKS_EFS_CSI_DriverRole-production` | `efs-csi-controller-sa` | EFS provisioning |
-| `eicon-production-loki-s3` / `eicon-production-prometheus-s3` | Loki / Prometheus (Thanos) service accounts | S3 object storage for logs/metrics |
+| `popcorn-production-loki-s3` / `popcorn-production-prometheus-s3` | Loki / Prometheus (Thanos) service accounts | S3 object storage for logs/metrics |
 
 **IRSA ordering trap** (bit us more than once during this build): if a ServiceAccount is created
 by a Helm chart/addon *before* `eksctl create iamserviceaccount --override-existing-serviceaccounts`
@@ -190,7 +190,7 @@ annotating is required — `eksctl` updating the SA alone does not propagate to 
 
 ## 6. Application layer
 
-### 6.1 `eicon-backend`
+### 6.1 `popcorn-backend`
 
 | | |
 |---|---|
@@ -200,15 +200,15 @@ annotating is required — `eksctl` updating the SA alone does not propagate to 
 | PDB | present (`pdb.yaml`) |
 | Storage | EFS RWX PVC, same pattern as staging |
 | Config | RDS host (`database-1.cslwsecwut6c.us-east-1.rds.amazonaws.com`), Qdrant Cloud URL, S3 buckets — same buckets EC2 production already uses, not separate test buckets |
-| Image | ECR `us-east-1`, repo `eicon-shazam-backend`, tag tracked per deploy (currently `a5d97aa`) |
+| Image | ECR `us-east-1`, repo `popcorn-shazam-backend`, tag tracked per deploy (currently `a5d97aa`) |
 
-### 6.2 `eicon-embedding`
+### 6.2 `popcorn-embedding`
 
 | | |
 |---|---|
 | Replicas | HPA `minReplicas: 1`, `maxReplicas: 5` @ 75% CPU |
 | Placement | soft affinity toward `node-type: gpu`; toleration for `nvidia.com/gpu=present:NoSchedule` |
-| Image | ECR `us-east-1`, repo `eicon-shazam-embedding`, same tag as backend per deploy |
+| Image | ECR `us-east-1`, repo `popcorn-shazam-embedding`, same tag as backend per deploy |
 | Startup note | the DINOv2 model weights (~346MB) and repo are downloaded at container start, not baked into the image — cold start can take several minutes. Startup probe budget is `initialDelaySeconds:10, periodSeconds:10, timeoutSeconds:10, failureThreshold:30` (~310s max) — tight; a slow cold start has come close to exhausting it and shown as a transient Argo CD "Degraded" that self-resolves once the model finishes loading. Not yet fixed (e.g. baking the model into the image) — flagged, not actioned. |
 
 Both Deployments source `DB_HOST`/`QDRANT_URL`/S3 bucket names etc. via `configMapGenerator` in
@@ -224,9 +224,9 @@ matches how this was done for every domain added during this build:
 
 | Ingress | Namespace | Host | ALB group | ACM cert | Healthcheck path |
 |---|---|---|---|---|---|
-| `eicon-ingress` | `eicon-production` | `test.eicon.io` | `eicon-production` | `524f1ab6-...` | `/health` |
-| `argocd-ingress` | `argocd` | `production-argocd.eicon.io` | `argocd-production` | `10ddfb98-...` | `/healthz` |
-| `prometheus-grafana` | `monitoring` | `k8s.grafana.eicon.io` | `grafana-production` | `46331cae-...` | `/api/health` |
+| `popcorn-ingress` | `popcorn-production` | `test.popcorn.io` | `popcorn-production` | `524f1ab6-...` | `/health` |
+| `argocd-ingress` | `argocd` | `production-argocd.popcorn.io` | `argocd-production` | `10ddfb98-...` | `/healthz` |
+| `prometheus-grafana` | `monitoring` | `k8s.grafana.popcorn.io` | `grafana-production` | `46331cae-...` | `/api/health` |
 
 **Healthcheck path matters and is not the same across apps** — this bit us once already:
 ArgoCD's ingress was initially set to `/health` (copied from the backend convention) but
@@ -241,26 +241,26 @@ non-200 and marks unhealthy. Staging already had this set; production initially 
 Grafana's ingress is the one exception to the "pure GitOps" pattern below — it's defined as a
 native `ingress:` block in the kube-prometheus-stack Helm values (Terraform-managed), not a
 Kustomize `Ingress` resource, because Grafana itself is Terraform/Helm-installed, not an Argo CD
-Application. See `eicon-infrastructure/modules/monitoring/main.tf` (`grafana_ingress_*` variables).
+Application. See `popcorn-infrastructure/modules/monitoring/main.tf` (`grafana_ingress_*` variables).
 
 ---
 
 ## 8. GitOps structure (Argo CD)
 
-App-of-apps pattern, root Application `eicon-root-production` pointing at
-`clusters/production` on the `production` branch of this repo (`eicon-gitops`).
+App-of-apps pattern, root Application `popcorn-root-production` pointing at
+`clusters/production` on the `production` branch of this repo (`popcorn-gitops`).
 
 ```
 apps/
-  eicon-backend/overlays/production/    → eicon-backend-prod   (ns: eicon-production)
-  eicon-embedding/overlays/production/  → eicon-embedding-prod (ns: eicon-production)
-  eicon-ingress/overlays/production/    → eicon-ingress-prod   (ns: eicon-production)
+  popcorn-backend/overlays/production/    → popcorn-backend-prod   (ns: popcorn-production)
+  popcorn-embedding/overlays/production/  → popcorn-embedding-prod (ns: popcorn-production)
+  popcorn-ingress/overlays/production/    → popcorn-ingress-prod   (ns: popcorn-production)
   argocd/overlays/production/           → argocd-ingress-prod  (ns: argocd)
   karpenter/overlays/production/        → karpenter-prod       (ns: karpenter)
 ```
 
-All `syncPolicy.automated: { prune: true, selfHeal: true }`. `eicon-backend-prod` and
-`eicon-embedding-prod` both `ignoreDifferences` on `/spec/replicas` so the HPA can own replica
+All `syncPolicy.automated: { prune: true, selfHeal: true }`. `popcorn-backend-prod` and
+`popcorn-embedding-prod` both `ignoreDifferences` on `/spec/replicas` so the HPA can own replica
 count without Argo CD fighting it back to the kustomize-declared count on every sync.
 
 **Not yet GitOps-managed** (installed directly via `kubectl`/`eksctl`, no git source of truth
@@ -272,16 +272,16 @@ burden, but weren't blocking and weren't requested.
 
 ## 9. CI/CD pipeline
 
-`eicon-backend` repo, `.github/workflows/production-cd-deploy.yml` — triggers on push to `main`
+`popcorn-backend` repo, `.github/workflows/production-cd-deploy.yml` — triggers on push to `main`
 or manual `workflow_dispatch`. **Deliberately mirrors staging's workflow exactly**, by explicit
 choice, rather than introducing a different pattern for production:
 
 1. Builds backend + embedding images, pushes `:latest`/`:latest-amd64` to the existing us-east-1
-   ECR repos (`eicon-shazam-backend`, `eicon-shazam-embedding`) — the same repos/tags EC2
+   ECR repos (`popcorn-shazam-backend`, `popcorn-shazam-embedding`) — the same repos/tags EC2
    production already uses.
 2. Additionally tags and pushes a commit-SHA tag (e.g. `a5d97aa`) for GitOps traceability, since
    `:latest` by itself can't be pinned in a kustomize overlay meaningfully.
-3. Prints manual next-step instructions. **It does not auto-commit to `eicon-gitops`** — by
+3. Prints manual next-step instructions. **It does not auto-commit to `popcorn-gitops`** — by
    explicit choice, to mirror staging's manual-update contract exactly.
 
 The actual deploy (updating `newTag` in both overlay `kustomization.yaml` files, committing,
@@ -305,11 +305,11 @@ Not yet scheduled. Because this platform already shares the same RDS/S3/Qdrant w
 production, **the cutover is a traffic switch, not a data migration**:
 
 1. Pre-cutover: confirm real load-test results, fix the `DB_HOST`/`QDRANT_URL` placeholders (now
-   done — see §6), decide how the `eicon-s3-upload-worker` SQS consumer behaves with both EC2 and
+   done — see §6), decide how the `popcorn-s3-upload-worker` SQS consumer behaves with both EC2 and
    EKS potentially running it briefly during the switch (idempotency vs. draining EC2's worker first).
-2. Issue an `api.eicon.io` ACM cert, add an ingress host rule, smoke-test via `/etc/hosts` before
+2. Issue an `api.popcorn.io` ACM cert, add an ingress host rule, smoke-test via `/etc/hosts` before
    touching real DNS.
-3. Lower `api.eicon.io`'s DNS TTL in advance, then flip the Squarespace record to the EKS ALB.
+3. Lower `api.popcorn.io`'s DNS TTL in advance, then flip the Squarespace record to the EKS ALB.
 4. Soak with EC2 kept warm as an instant rollback for a few days.
 5. Decommission EC2 only after the soak period is clean.
 
@@ -321,14 +321,14 @@ EKS setup is done" as implying the cutover should happen.
 ## 11. Monitoring
 
 `kube-prometheus-stack` (Prometheus, Grafana, Alertmanager) + `loki-stack`, all Terraform/Helm
-managed (`eicon-infrastructure/modules/monitoring`), **not** Argo CD-managed — this is the one
+managed (`popcorn-infrastructure/modules/monitoring`), **not** Argo CD-managed — this is the one
 major piece of the platform installed outside the GitOps flow.
 
 | Component | Storage | Exposure |
 |---|---|---|
 | Prometheus | `emptyDir` (ephemeral, retention 7d) | ClusterIP only |
-| Grafana | no persistence (`persistence.enabled: false`) | ALB Ingress, `https://k8s.grafana.eicon.io` |
-| Loki | S3 (via `eicon-production-loki-s3` IRSA role) | ClusterIP only |
+| Grafana | no persistence (`persistence.enabled: false`) | ALB Ingress, `https://k8s.grafana.popcorn.io` |
+| Loki | S3 (via `popcorn-production-loki-s3` IRSA role) | ClusterIP only |
 | `dcgm-exporter` | — | GPU metrics, ServiceMonitor |
 
 Grafana was originally exposed as a bare `LoadBalancer` Service (a Classic ELB, HTTP-only, no
@@ -336,7 +336,7 @@ custom domain). Converted 2026-10-12 to `ClusterIP` + ALB Ingress with its own A
 stable hostname and TLS, consistent with how every other domain on this platform is set up. The
 old Classic ELB was torn down as part of that change. Grafana admin credentials live in the
 `grafana-credentials` K8s Secret (`monitoring` namespace), sourced from Terraform variables, not
-from the shared `eicon/backend/credentials` secret.
+from the shared `popcorn/backend/credentials` secret.
 
 ---
 
@@ -344,14 +344,14 @@ from the shared `eicon/backend/credentials` secret.
 
 EKS Access Entries (`authenticationMode: API_AND_CONFIG_MAP`) are the mechanism for **human** IAM
 users — the `aws-auth` ConfigMap (`mapRoles`) is used only for **node** IAM roles (e.g.
-`KarpenterNodeRole-eicon-production-eks`), matching staging's convention exactly.
+`KarpenterNodeRole-popcorn-production-eks`), matching staging's convention exactly.
 
 ```bash
-aws eks create-access-entry --cluster-name eicon-production-eks --region us-east-1 \
-  --principal-arn arn:aws:iam::491085416489:user/<username>
+aws eks create-access-entry --cluster-name popcorn-production-eks --region us-east-1 \
+  --principal-arn arn:aws:iam::************:user/<username>
 
-aws eks associate-access-policy --cluster-name eicon-production-eks --region us-east-1 \
-  --principal-arn arn:aws:iam::491085416489:user/<username> \
+aws eks associate-access-policy --cluster-name popcorn-production-eks --region us-east-1 \
+  --principal-arn arn:aws:iam::************:user/<username> \
   --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
   --access-scope type=cluster
 ```
@@ -367,7 +367,7 @@ precedent, not a new policy decision made for this platform.
 ## 13. Build history — real bugs found and fixed
 
 In the order they were hit during the build (full detail in
-`eicon-infrastructure/docs/PRODUCTION_MIGRATION_PLAN.md`):
+`popcorn-infrastructure/docs/PRODUCTION_MIGRATION_PLAN.md`):
 
 1. **Karpenter nodes never joined the cluster** — `aws-auth` was missing the
    `KarpenterNodeRole` mapping. Fixed by adding the `mapRoles` entry, mirroring staging.
@@ -394,7 +394,7 @@ In the order they were hit during the build (full detail in
    of `/healthz`) plus missing `server.insecure: "true"`. See [§7](#7-ingress--dns).
 9. **CI build failure, "no space left on device"** — `SKIP_BACKUP` was silently ignored by
    `build-and-push.sh`. See [§9](#9-cicd-pipeline).
-10. **Local DNS caching** blocked browser access to `test.eicon.io` after the ingress was already
+10. **Local DNS caching** blocked browser access to `test.popcorn.io` after the ingress was already
     healthy — not a platform bug, but cost real debugging time; fixed by flushing the client's
     local DNS cache / switching DNS servers.
 
@@ -403,12 +403,12 @@ In the order they were hit during the build (full detail in
 ## 14. Known gaps / not yet done
 
 - **Load testing**: agreed approach was an "infra-only sanity ramp" (500→3,000 synthetic users
-  against `test.eicon.io`) before any real cutover decision — not yet executed.
+  against `test.popcorn.io`) before any real cutover decision — not yet executed.
 - **Qdrant connection-pooling bug**: a known staging app-level bug, confirmed still present on
-  `eicon-backend`'s `main` branch as of this writing. Relevant to production capacity testing,
+  `popcorn-backend`'s `main` branch as of this writing. Relevant to production capacity testing,
   not yet fixed.
-- **Write-path functional testing** (`/identify`, signup/login) against `test.eicon.io` has been
-  deliberately out of scope so far — read-only validation only, since `test.eicon.io` shares real
+- **Write-path functional testing** (`/identify`, signup/login) against `test.popcorn.io` has been
+  deliberately out of scope so far — read-only validation only, since `test.popcorn.io` shares real
   production data.
 - **Staging has the identical ALB healthcheck-path and CI `SKIP_BACKUP`-adjacent bugs** — flagged
   during this build, not backported to staging since there was no explicit request to fix them

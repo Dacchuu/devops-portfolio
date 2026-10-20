@@ -52,7 +52,7 @@ terraform apply
 
 State is stored in:
 ```
-s3://eicon-terraform-state-bucket/environments/production/
+s3://popcorn-terraform-state-bucket/environments/production/
 ```
 ## Notes
 

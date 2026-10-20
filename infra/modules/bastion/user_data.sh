@@ -82,7 +82,7 @@ cat > /opt/bastion/append-devops-keys.sh << 'APPENDSCRIPT'
 #!/bin/bash
 set -e
 KEYS_FILE="/home/ec2-user/.ssh/authorized_keys"
-MARKER="# eicon-devops-ssh-keys-v1"
+MARKER="# popcorn-devops-ssh-keys-v1"
 if grep -qF "$MARKER" "$KEYS_FILE" 2>/dev/null; then
   exit 0
 fi

@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: popcorn-backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          env:
+            - name: DISABLE_RATE_LIMITING
+              value: "true"

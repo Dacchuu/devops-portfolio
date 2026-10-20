@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: popcorn-embedding
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Equal"
+          value: "present"
+          effect: "NoSchedule"

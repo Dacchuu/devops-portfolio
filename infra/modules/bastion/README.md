@@ -28,7 +28,7 @@ Minimal steps to use this module from an environment stack (for example `environ
    module "bastion" {
      source = "../../modules/bastion"
 
-     project_name            = "eicon"
+     project_name            = "popcorn"
      environment             = "staging"
      vpc_id                  = module.vpc.vpc_id
      public_subnet_id        = module.vpc.public_subnet_ids[0]

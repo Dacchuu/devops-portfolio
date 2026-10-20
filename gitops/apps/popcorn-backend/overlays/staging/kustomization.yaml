@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: popcorn-staging
+
+resources:
+  - hpa.yaml
+  - ../../base
+  - external-secret.yaml
+  - efs-storageclass.yaml
+  - pvc-efs.yaml
+  - pdb.yaml
+
+replicas:
+  - name: popcorn-backend
+    count: 1
+
+patchesStrategicMerge:
+  - disable-rate-limiting.yaml
+  - probe-tuning.yaml
+  - rollout-strategy.yaml
+  - topology-spread.yaml
+  - resources.yaml
+  - node-affinity.yaml
+
+configMapGenerator:
+  - name: backend-config
+    behavior: merge
+    literals:
+      - DB_HOST=
+      - DB_PORT=5432
+      - DB_NAME=
+      - QDRANT_URL=
+      - EMBEDDING_SERVICE_URL=
+      - AWS_S3_BUCKET_NAME_IMAGES=
+      - AWS_S3_BUCKET_NAME_THUMBNAILS=
+      - AWS_S3_BUCKET_NAME_PROFILE_PICTURES=
+      - AWS_S3_BUCKET_NAME_QUERY_IMAGES=
+      - AWS_REGION=
+      - S3_BUCKET=
+      - CHECKPOINT_PATH=
+      - PROMETHEUS_METRICS_ENABLED=true
+
+# Pin image by git SHA (updated by CI in cd-deploy.yaml)
+images:
+  - name: ***********.dkr.ecr.us-west-1.amazonaws.com/popcorn-shazam-backend
+    newName: ***********.dkr.ecr.us-west-1.amazonaws.com/popcorn-shazam-backend
+    newTag: "TAG_ID"

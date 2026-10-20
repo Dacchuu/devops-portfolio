@@ -3,7 +3,7 @@
 variable "project_name" {
   description = "Project name for tagging and module inputs"
   type        = string
-  default     = "eicon"
+  default     = "popcorn"
 }
 
 variable "environment" {
@@ -16,7 +16,7 @@ variable "environment" {
 variable "terraform_state_bucket" {
   description = "S3 bucket holding Terraform state"
   type        = string
-  default     = "eicon-terraform-state-bucket"
+  default     = "popcorn-terraform-state-bucket"
 }
 
 variable "terraform_state_region" {
@@ -94,7 +94,7 @@ variable "node_group_disk_size" {
 }
 
 variable "create_main_node_group" {
-  description = "Whether to create the Terraform-managed 'main' node group. Set to false when compute is managed outside Terraform (e.g. ad-hoc AWS-CLI-managed groups like eicon-gpu-ng, eicon-cpu-ng, eicon-cpu-az1-ng)."
+  description = "Whether to create the Terraform-managed 'main' node group. Set to false when compute is managed outside Terraform (e.g. ad-hoc AWS-CLI-managed groups like popcorn-gpu-ng, popcorn-cpu-ng, popcorn-cpu-az1-ng)."
   type        = bool
   default     = true
 }

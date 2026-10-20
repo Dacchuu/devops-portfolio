@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend-config
-data:
-  EMBEDDING_SERVICE_URL: http://eicon-embedding
-  QDRANT_URL: http://eicon-qdrant:6333
-  PROMETHEUS_METRICS_ENABLED: "true"

@@ -3,7 +3,7 @@
 variable "project_name" {
   description = "Project name used for resource naming and tags"
   type        = string
-  default     = "eicon"
+  default     = "popcorn"
 }
 
 variable "environment" {

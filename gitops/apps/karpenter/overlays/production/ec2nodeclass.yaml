@@ -3,13 +3,13 @@ kind: EC2NodeClass
 metadata:
   name: production-general
 spec:
-  role: KarpenterNodeRole-eicon-production-eks
+  role: KarpenterNodeRole-popcorn-production-eks
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: eicon-production-eks
+        karpenter.sh/discovery: popcorn-production-eks
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: eicon-production-eks
+        karpenter.sh/discovery: popcorn-production-eks
   amiSelectorTerms:
     - alias: al2023@latest
   blockDeviceMappings:

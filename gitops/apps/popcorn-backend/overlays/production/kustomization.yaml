@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: popcorn-production
+
+resources:
+  - hpa.yaml
+  - ../../base
+  - external-secret.yaml
+  - efs-storageclass.yaml
+  - pvc-efs.yaml
+  - pdb.yaml
+
+replicas:
+  - name: popcorn-backend
+    count: 2
+
+patchesStrategicMerge:
+  - disable-rate-limiting.yaml
+  - probe-tuning.yaml
+  - rollout-strategy.yaml
+  - topology-spread.yaml
+  - resources.yaml
+  - node-affinity.yaml
+
+configMapGenerator:
+  - name: backend-config
+    behavior: merge
+    literals:
+      - DB_HOST=DB_URL
+      - DB_PORT=5432
+      - DB_NAME=
+      - QDRANT_URL=
+      - EMBEDDING_SERVICE_URL=
+      - AWS_S3_BUCKET_NAME_IMAGES=
+      - AWS_S3_BUCKET_NAME_THUMBNAILS=
+      - AWS_S3_BUCKET_NAME_PROFILE_PICTURES=
+      - AWS_S3_BUCKET_NAME_QUERY_IMAGES=
+      - AWS_REGION=
+      - S3_BUCKET=
+      - CHECKPOINT_PATH=
+      - PROMETHEUS_METRICS_ENABLED=true
+
+# Existing us-east-1 repo, kept up to date by the EC2 "PRODUCTION DEPLOY" GitHub Actions
+# workflow (build-and-push.sh) whenever it's manually triggered against main. Same image the
+# live EC2 production runs.
+images:
+  - name: ************.dkr.ecr.us-west-1.amazonaws.com/popcorn-shazam-backend
+    newName: ***********.dkr.ecr.us-east-1.amazonaws.com/popcorn-shazam-backend
+    newTag: "TAG_ID"

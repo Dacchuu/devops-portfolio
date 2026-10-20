@@ -1,4 +1,4 @@
-<title>Eicon Platform Topology</title>
+<title>Popcorn Platform Topology</title>
 <style>
   /* layout: header, then a horizontally-scrollable diagram panel, then a two-column legend */
   :root {
@@ -81,8 +81,8 @@
 
 <div class="wrap">
   <header>
-    <h1>Eicon Platform Topology — Staging &amp; Production</h1>
-    <p>Both EKS environments run in parallel from the same GitHub repos. Staging (us-west-1) and the new production EKS build (us-east-1) are fully separate clusters with separate data — except production EKS, which deliberately shares RDS/S3/Qdrant with the still-live EC2 production while it proves itself out on <code>test.eicon.io</code>. No DNS cutover has happened yet.</p>
+    <h1>popcorn Platform Topology — Staging &amp; Production</h1>
+    <p>Both EKS environments run in parallel from the same GitHub repos. Staging (us-west-1) and the new production EKS build (us-east-1) are fully separate clusters with separate data — except production EKS, which deliberately shares RDS/S3/Qdrant with the still-live EC2 production while it proves itself out on <code>test.popcorn.io</code>. No DNS cutover has happened yet.</p>
   </header>
 
   <div class="panel diagram-scroll">
@@ -94,16 +94,16 @@ flowchart TB
   classDef gh fill:#e7f6ee,stroke:#2f8f5b,color:#1c2230,stroke-width:1px;
 
   subgraph GH["GitHub"]
-    REPOAPP["App repo<br/>eicon-backend"]
-    REPOGITOPS["GitOps repo<br/>eicon-gitops"]
+    REPOAPP["App repo<br/>popcorn-backend"]
+    REPOGITOPS["GitOps repo<br/>popcorn-gitops"]
   end
 
-  subgraph STG["STAGING · us-west-1 · eicon-staging-eks"]
+  subgraph STG["STAGING · us-west-1 · popcorn-staging-eks"]
     CISTG["CI<br/>staging-cd-deploy.yml"]
-    ARGOSTG["Argo CD<br/>staging-argocd.eicon.io"]
+    ARGOSTG["Argo CD<br/>staging-argocd.popcorn.io"]
     ALBSTG["ALB Ingress"]
-    BESTG["eicon-backend<br/>HPA 2–20"]
-    EMBSTG["eicon-embedding"]
+    BESTG["popcorn-backend<br/>HPA 2–20"]
+    EMBSTG["popcorn-embedding"]
     CPUSTG["CPU nodes<br/>floor + Karpenter burst"]
     GPUSTG["GPU node<br/>g4dn.xlarge"]
     RDSSTG[("RDS Postgres<br/>staging-database")]
@@ -112,17 +112,17 @@ flowchart TB
     MONSTG["Prometheus · Grafana · Loki"]
   end
 
-  subgraph PROD["PRODUCTION EKS · us-east-1 · eicon-production-eks"]
+  subgraph PROD["PRODUCTION EKS · us-east-1 · popcorn-production-eks"]
     CIPROD["CI<br/>production-cd-deploy.yml"]
-    ARGOPROD["Argo CD<br/>production-argocd.eicon.io"]
-    ALBPROD["ALB Ingress<br/>test.eicon.io"]
-    BEPROD["eicon-backend<br/>HPA 2–20"]
-    EMBPROD["eicon-embedding<br/>HPA 1–5"]
+    ARGOPROD["Argo CD<br/>production-argocd.popcorn.io"]
+    ALBPROD["ALB Ingress<br/>test.popcorn.io"]
+    BEPROD["popcorn-backend<br/>HPA 2–20"]
+    EMBPROD["popcorn-embedding<br/>HPA 1–5"]
     SYSPROD["System floor (t3.medium)<br/>ArgoCD · CoreDNS · ESO · CSI/ALB controllers"]
     CPUPROD["Karpenter CPU nodes<br/>m6i.large/xlarge"]
     GPUPROD["Karpenter GPU node<br/>g4dn.xlarge, tainted"]
     EFSPROD[("EFS uploads")]
-    GRAFPROD["Grafana<br/>k8s.grafana.eicon.io"]
+    GRAFPROD["Grafana<br/>k8s.grafana.popcorn.io"]
   end
 
   subgraph DATA["Shared production data · us-east-1"]
@@ -132,7 +132,7 @@ flowchart TB
   end
 
   subgraph EC2["EC2 + Docker — LIVE traffic · us-east-1"]
-    API["api.eicon.io"]
+    API["api.popcorn.io"]
   end
 
   REPOAPP -->|push: staging| CISTG
@@ -179,8 +179,8 @@ flowchart TB
       <h3><span class="swatch" style="background:var(--staging)"></span>Staging</h3>
       <dl>
         <dt>Region</dt><dd>us-west-1</dd>
-        <dt>Cluster</dt><dd>eicon-staging-eks</dd>
-        <dt>Namespace</dt><dd>eicon-staging</dd>
+        <dt>Cluster</dt><dd>popcorn-staging-eks</dd>
+        <dt>Namespace</dt><dd>popcorn-staging</dd>
         <dt>CI trigger</dt><dd>push → staging branch</dd>
         <dt>Data</dt><dd>own RDS + Qdrant, not shared</dd>
       </dl>
@@ -189,28 +189,28 @@ flowchart TB
       <h3><span class="swatch" style="background:var(--production)"></span>Production EKS</h3>
       <dl>
         <dt>Region</dt><dd>us-east-1</dd>
-        <dt>Cluster</dt><dd>eicon-production-eks</dd>
-        <dt>Namespace</dt><dd>eicon-production</dd>
+        <dt>Cluster</dt><dd>popcorn-production-eks</dd>
+        <dt>Namespace</dt><dd>popcorn-production</dd>
         <dt>VPC</dt><dd>10.60.0.0/16</dd>
         <dt>CI trigger</dt><dd>push → main branch</dd>
-        <dt>Status</dt><dd>validating on test.eicon.io</dd>
+        <dt>Status</dt><dd>validating on test.popcorn.io</dd>
       </dl>
     </div>
     <div class="legend-card">
       <h3><span class="swatch" style="background:var(--shared)"></span>Shared / live EC2</h3>
       <dl>
-        <dt>Data store</dt><dd>eicon/backend/credentials</dd>
+        <dt>Data store</dt><dd>popcorn/backend/credentials</dd>
         <dt>RDS</dt><dd>database-1, PubliclyAccessible</dd>
         <dt>Peering</dt><dd>pcx-009ffb3385f8df54b</dd>
         <dt>EC2 VPC</dt><dd>172.31.0.0/16</dd>
-        <dt>Live endpoint</dt><dd>api.eicon.io</dd>
+        <dt>Live endpoint</dt><dd>api.popcorn.io</dd>
       </dl>
     </div>
     <div class="legend-card">
       <h3><span class="swatch" style="background:var(--gh)"></span>GitHub</h3>
       <dl>
-        <dt>App repo</dt><dd>eicon-backend</dd>
-        <dt>GitOps repo</dt><dd>eicon-gitops</dd>
+        <dt>App repo</dt><dd>popcorn-backend</dd>
+        <dt>GitOps repo</dt><dd>popcorn-gitops</dd>
         <dt>Branches</dt><dd>staging, production</dd>
         <dt>Deploy</dt><dd>manual GitOps update after CI</dd>
       </dl>
@@ -221,11 +221,11 @@ flowchart TB
     <b>Reading this diagram</b>
     <ul>
       <li>Solid arrows are runtime traffic/data paths. Dashed arrows are GitOps management (Argo CD syncing a Deployment) or monitoring scrape paths — not request traffic.</li>
-      <li>Production EKS and the live EC2 app connect to the <b>same</b> RDS, S3 buckets, and Qdrant instance over a VPC peering connection — this is a deliberate choice so <code>test.eicon.io</code> validates against real data, not a copy.</li>
-      <li>Cutover (moving <code>api.eicon.io</code> from EC2 onto this EKS platform) is a future, separate, explicitly-confirmed DNS change — not implied by anything in this diagram.</li>
-      <li>Full written reference: <code>eicon-gitops/docs/PRODUCTION_ARCHITECTURE.md</code> and <code>eicon-gitops/docs/PLATFORM_ARCHITECTURE.md</code> (staging).</li>
+      <li>Production EKS and the live EC2 app connect to the <b>same</b> RDS, S3 buckets, and Qdrant instance over a VPC peering connection — this is a deliberate choice so <code>test.popcorn.io</code> validates against real data, not a copy.</li>
+      <li>Cutover (moving <code>api.popcorn.io</code> from EC2 onto this EKS platform) is a future, separate, explicitly-confirmed DNS change — not implied by anything in this diagram.</li>
+      <li>Full written reference: <code>popcorn-gitops/docs/PRODUCTION_ARCHITECTURE.md</code> and <code>popcorn-gitops/docs/PLATFORM_ARCHITECTURE.md</code> (staging).</li>
     </ul>
   </div>
 
-  <footer>Eicon Platform — consolidated 2026-10-12</footer>
+  <footer>popcorn Platform — consolidated 2026-10-12</footer>
 </div>

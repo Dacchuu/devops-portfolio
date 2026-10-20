@@ -4,14 +4,14 @@ metadata:
   name: staging
   namespace: argocd
 spec:
-  description: Eicon staging apps
+  description: popcorn staging apps
   sourceRepos:
-    - 'https://github.com/EiconVision/eicon-gitops.git'
+    - '<Repo URL>'
     - 'https://kubernetes.github.io/autoscaler'
     - 'https://kubernetes-sigs.github.io/descheduler'
   destinations:
     - server: https://kubernetes.default.svc
-      namespace: eicon-staging
+      namespace: popcorn-staging
     - server: https://kubernetes.default.svc
       namespace: argocd
     - server: https://kubernetes.default.svc

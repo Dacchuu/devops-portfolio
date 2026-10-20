@@ -1,63 +1,63 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-backend-prod
+  name: popcorn-backend-prod
   namespace: argocd
 spec:
   project: production
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: production
-    path: apps/eicon-backend/overlays/production
+    path: apps/popcorn-backend/overlays/production
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-production
+    namespace: popcorn-production
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true]
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: eicon-backend
+      name: popcorn-backend
       jsonPointers: [/spec/replicas]
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-embedding-prod
+  name: popcorn-embedding-prod
   namespace: argocd
 spec:
   project: production
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: production
-    path: apps/eicon-embedding/overlays/production
+    path: apps/popcorn-embedding/overlays/production
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-production
+    namespace: popcorn-production
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true]
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: eicon-embedding
+      name: popcorn-embedding
       jsonPointers: [/spec/replicas]
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eicon-ingress-prod
+  name: popcorn-ingress-prod
   namespace: argocd
 spec:
   project: production
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: production
-    path: apps/eicon-ingress/overlays/production
+    path: apps/popcorn-ingress/overlays/production
   destination:
     server: https://kubernetes.default.svc
-    namespace: eicon-production
+    namespace: popcorn-production
   syncPolicy:
     automated: { prune: true, selfHeal: true }
 ---
@@ -69,7 +69,7 @@ metadata:
 spec:
   project: production
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: production
     path: apps/argocd/overlays/production
   destination:
@@ -87,7 +87,7 @@ metadata:
 spec:
   project: production
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: <Repo URL>
     targetRevision: production
     path: apps/karpenter/overlays/production
   destination:

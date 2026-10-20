@@ -14,7 +14,7 @@
       }
     ]
   },
-  "description": "eicon-backend container metrics",
+  "description": "popcorn-backend container metrics",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -106,7 +106,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "sum(time() - node_boot_time_seconds{job=\"eicon-backend_host\"})",
+          "expr": "sum(time() - node_boot_time_seconds{job=\"popcorn-backend_host\"})",
           "intervalFactor": 1,
           "legendFormat": "Used",
           "refId": "A",
@@ -191,7 +191,7 @@
           "step": 1800
         }
       ],
-      "title": "Container Count on eicon-backend",
+      "title": "Container Count on popcorn-backend",
       "type": "stat"
     },
     {
@@ -266,7 +266,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "sum(node_memory_MemTotal_bytes{job=\"eicon-backend_host\"} - node_memory_MemFree_bytes{job=\"eicon-backend_host\"} - node_memory_Buffers_bytes{job=\"eicon-backend_host\"} - node_memory_Cached_bytes{job=\"eicon-backend_host\"}) / sum(machine_memory_bytes{job=\"eicon-backend_services\"}) * 100",
+          "expr": "sum(node_memory_MemTotal_bytes{job=\"popcorn-backend_host\"} - node_memory_MemFree_bytes{job=\"popcorn-backend_host\"} - node_memory_Buffers_bytes{job=\"popcorn-backend_host\"} - node_memory_Cached_bytes{job=\"popcorn-backend_host\"}) / sum(machine_memory_bytes{job=\"popcorn-backend_services\"}) * 100",
           "legendFormat": "Used RAM Memory",
           "refId": "D"
         },
@@ -274,7 +274,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"eicon-backend_host\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"popcorn-backend_host\",mode=\"idle\"}[5m])) * 100)",
           "legendFormat": "CPU Busy",
           "refId": "E"
         },
@@ -282,7 +282,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "100 - ((node_filesystem_avail_bytes{job=\"eicon-backend_host\",fstype=\"ext4\",mountpoint=\"/\"} * 100) / node_filesystem_size_bytes{job=\"eicon-backend_host\",fstype=\"ext4\",mountpoint=\"/\"})",
+          "expr": "100 - ((node_filesystem_avail_bytes{job=\"popcorn-backend_host\",fstype=\"ext4\",mountpoint=\"/\"} * 100) / node_filesystem_size_bytes{job=\"popcorn-backend_host\",fstype=\"ext4\",mountpoint=\"/\"})",
           "legendFormat": "Used Disk Space (/)",
           "refId": "C"
         }
@@ -360,7 +360,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "sum(count(node_cpu_seconds_total{job=\"eicon-backend_host\", mode='system'}) by (cpu))",
+          "expr": "sum(count(node_cpu_seconds_total{job=\"popcorn-backend_host\", mode='system'}) by (cpu))",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A",
@@ -463,7 +463,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "machine_memory_bytes{job=\"eicon-backend_services\"} ",
+          "expr": "machine_memory_bytes{job=\"popcorn-backend_services\"} ",
           "legendFormat": "Total",
           "refId": "E"
         },
@@ -471,7 +471,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "node_memory_MemTotal_bytes{job=\"eicon-backend_host\"} - node_memory_MemFree_bytes{job=\"eicon-backend_host\"} - node_memory_Buffers_bytes{job=\"eicon-backend_host\"} - node_memory_Cached_bytes{job=\"eicon-backend_host\"}",
+          "expr": "node_memory_MemTotal_bytes{job=\"popcorn-backend_host\"} - node_memory_MemFree_bytes{job=\"popcorn-backend_host\"} - node_memory_Buffers_bytes{job=\"popcorn-backend_host\"} - node_memory_Cached_bytes{job=\"popcorn-backend_host\"}",
           "intervalFactor": 2,
           "legendFormat": "Used",
           "refId": "A",
@@ -481,7 +481,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "node_memory_MemFree_bytes{job=\"eicon-backend_host\"}",
+          "expr": "node_memory_MemFree_bytes{job=\"popcorn-backend_host\"}",
           "legendFormat": "FreeMem",
           "refId": "D"
         },
@@ -489,7 +489,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "node_memory_Cached_bytes{job=\"eicon-backend_host\"}",
+          "expr": "node_memory_Cached_bytes{job=\"popcorn-backend_host\"}",
           "legendFormat": "Cached",
           "refId": "C"
         },
@@ -497,7 +497,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "node_memory_Buffers_bytes{job=\"eicon-backend_host\"}",
+          "expr": "node_memory_Buffers_bytes{job=\"popcorn-backend_host\"}",
           "legendFormat": "Buffer",
           "refId": "B"
         }
@@ -599,7 +599,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "sum(node_memory_MemTotal_bytes{job=\"eicon-backend_host\"} - node_memory_MemFree_bytes{job=\"eicon-backend_host\"} - node_memory_Buffers_bytes{job=\"eicon-backend_host\"} - node_memory_Cached_bytes{job=\"eicon-backend_host\"}) / sum(machine_memory_bytes{job=\"eicon-backend_services\"}) * 100",
+          "expr": "sum(node_memory_MemTotal_bytes{job=\"popcorn-backend_host\"} - node_memory_MemFree_bytes{job=\"popcorn-backend_host\"} - node_memory_Buffers_bytes{job=\"popcorn-backend_host\"} - node_memory_Cached_bytes{job=\"popcorn-backend_host\"}) / sum(machine_memory_bytes{job=\"popcorn-backend_services\"}) * 100",
           "intervalFactor": 1,
           "legendFormat": "Used",
           "refId": "A",
@@ -703,7 +703,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"eicon-backend_host\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"popcorn-backend_host\",mode=\"idle\"}[5m])) * 100)",
           "legendFormat": "CPU",
           "refId": "B"
         }
@@ -774,7 +774,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"eicon-backend_host\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg(irate(node_cpu_seconds_total{job=\"popcorn-backend_host\",mode=\"idle\"}[5m])) * 100)",
           "legendFormat": "CPU",
           "refId": "B"
         }
@@ -876,7 +876,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "100 - (100 * ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype=\"ext4\",job=\"eicon-backend_host\"} )  / (node_filesystem_size_bytes{mountpoint=\"/\",fstype=\"ext4\",job=\"eicon-backend_host\"}) ))",
+          "expr": "100 - (100 * ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype=\"ext4\",job=\"popcorn-backend_host\"} )  / (node_filesystem_size_bytes{mountpoint=\"/\",fstype=\"ext4\",job=\"popcorn-backend_host\"}) ))",
           "legendFormat": "Used",
           "refId": "A"
         }
@@ -951,7 +951,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "container_fs_limit_bytes{device=\"/dev/root\",id=\"/\",job=\"eicon-backend_services\"}",
+          "expr": "container_fs_limit_bytes{device=\"/dev/root\",id=\"/\",job=\"popcorn-backend_services\"}",
           "legendFormat": "Used",
           "refId": "A"
         }
@@ -1026,7 +1026,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "container_fs_usage_bytes{device=\"/dev/root\",id=\"/\",job=\"eicon-backend_services\"}",
+          "expr": "container_fs_usage_bytes{device=\"/dev/root\",id=\"/\",job=\"popcorn-backend_services\"}",
           "legendFormat": "Used",
           "refId": "A"
         }
@@ -1127,7 +1127,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "sum (rate (container_network_receive_bytes_total{job=\"eicon-backend_services\"}[1m]))",
+          "expr": "sum (rate (container_network_receive_bytes_total{job=\"popcorn-backend_services\"}[1m]))",
           "legendFormat": "{{device}} receive",
           "refId": "A"
         },
@@ -1135,7 +1135,7 @@
           "datasource": {
             "uid": "Prometheus"
           },
-          "expr": "- sum (rate (container_network_transmit_bytes_total{job=\"eicon-backend_services\"}[1m]))",
+          "expr": "- sum (rate (container_network_transmit_bytes_total{job=\"popcorn-backend_services\"}[1m]))",
           "legendFormat": "{{device}} transmit",
           "refId": "B"
         }
@@ -1598,7 +1598,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-backend",
+      "title": "popcorn-backend",
       "type": "timeseries"
     },
     {
@@ -1693,7 +1693,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-embedding",
+      "title": "popcorn-embedding",
       "type": "timeseries"
     },
     {
@@ -1788,7 +1788,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-postgres",
+      "title": "popcorn-postgres",
       "type": "timeseries"
     },
     {
@@ -1883,7 +1883,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-qdrant",
+      "title": "popcorn-qdrant",
       "type": "timeseries"
     },
     {
@@ -1995,7 +1995,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-backend",
+      "title": "popcorn-backend",
       "type": "timeseries"
     },
     {
@@ -2094,7 +2094,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-embedding",
+      "title": "popcorn-embedding",
       "type": "timeseries"
     },
     {
@@ -2193,7 +2193,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-postgres",
+      "title": "popcorn-postgres",
       "type": "timeseries"
     },
     {
@@ -2292,7 +2292,7 @@
           "refId": "A"
         }
       ],
-      "title": "eicon-qdrant",
+      "title": "popcorn-qdrant",
       "type": "timeseries"
     },
     {
@@ -2617,7 +2617,7 @@
   "tags": [
     "containers",
     "prod",
-    "eicon-backend"
+    "popcorn-backend"
   ],
   "templating": {
     "list": [
@@ -2762,13 +2762,13 @@
           ]
         },
         "datasource": "Prometheus",
-        "definition": "label_values(node_cpu_seconds_total{job=\"eicon-backend_host\"}, cpu)",
+        "definition": "label_values(node_cpu_seconds_total{job=\"popcorn-backend_host\"}, cpu)",
         "includeAll": true,
         "label": "CPU",
         "multi": true,
         "name": "cpu",
         "options": [],
-        "query": "label_values(node_cpu_seconds_total{job=\"eicon-backend_host\"}, cpu)",
+        "query": "label_values(node_cpu_seconds_total{job=\"popcorn-backend_host\"}, cpu)",
         "refresh": 1,
         "regex": "",
         "sort": 3,
@@ -2776,19 +2776,19 @@
       },
       {
         "current": {
-          "text": "eicon-backend_host",
+          "text": "popcorn-backend_host",
           "value": [
-            "eicon-backend_host"
+            "popcorn-backend_host"
           ]
         },
         "datasource": "Prometheus",
-        "definition": "label_values({__name__=~\"node_cpu_seconds_total\", job=\"eicon-backend_host\"}, job)",
+        "definition": "label_values({__name__=~\"node_cpu_seconds_total\", job=\"popcorn-backend_host\"}, job)",
         "includeAll": false,
         "label": "Host",
         "multi": true,
         "name": "host",
         "options": [],
-        "query": "label_values({__name__=~\"node_cpu_seconds_total\", job=\"eicon-backend_host\"}, job)",
+        "query": "label_values({__name__=~\"node_cpu_seconds_total\", job=\"popcorn-backend_host\"}, job)",
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -2802,7 +2802,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "eicon-backend",
+  "title": "popcorn-backend",
   "uid": "adefedsafdevadfaen1EifQSRGaWmafdfe",
   "version": 17
 }

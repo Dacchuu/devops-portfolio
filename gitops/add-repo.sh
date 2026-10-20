@@ -10,10 +10,10 @@ if [ -z "$1" ]; then
 fi
 
 GITHUB_TOKEN="$1"
-REPO_URL="https://github.com/EiconVision/eicon-gitops.git"
+REPO_URL="<Repo URL>"
 
 # Create the repository secret
-kubectl create secret generic eicon-gitops-repo \
+kubectl create secret generic popcorn-gitops-repo \
   -n argocd \
   --from-literal=type=git \
   --from-literal=url="$REPO_URL" \

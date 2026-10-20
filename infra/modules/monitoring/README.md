@@ -119,7 +119,7 @@ DevOps Team
 
 # 📁 Final Repo Structure
 ```hcl
-eicon-infrastructure
+popcorn-infrastructure
 │
 ├── modules
 │ ├── vpc

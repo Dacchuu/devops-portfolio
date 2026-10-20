@@ -31,7 +31,7 @@ Example usage:
 module "vpc" {
   source = "../../modules/vpc"
 
-  project_name = "eicon"
+  project_name = "popcorn"
   environment  = "production"
 
   vpc_cidr = "10.0.0.0/16"
@@ -45,7 +45,7 @@ module "vpc" {
 
   tags = {
     Environment = "production"
-    Project     = "eicon"
+    Project     = "popcorn"
   }
 }
 ```

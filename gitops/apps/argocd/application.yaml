@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/EiconVision/eicon-gitops.git
+    repoURL: https://github.com/PopcornVision/popcorn-gitops.git
     targetRevision: staging
     path: apps/argocd/overlays/staging
   destination:
